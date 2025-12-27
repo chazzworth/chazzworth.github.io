@@ -2795,7 +2795,20 @@ INSTRUCTIONS:
 
             try {
                 const users = loadFromStorage('users');
-                const data = JSON.stringify(users, null, 2);
+
+                // Include admin settings in cloud sync
+                const cloudData = {
+                    users: users,
+                    adminSettings: {
+                        globalApiKey: loadFromStorage('globalApiKey'),
+                        adminPassword: loadFromStorage('adminPassword'),
+                        adminCloudSyncEnabled: loadFromStorage('adminCloudSyncEnabled')
+                    },
+                    version: GAME_VERSION,
+                    lastSync: new Date().toISOString()
+                };
+
+                const data = JSON.stringify(cloudData, null, 2);
                 const gistData = {
                     description: 'Solo Dungeon Master - All Users Data',
                     public: false,
@@ -2889,8 +2902,29 @@ INSTRUCTIONS:
                 const content = gist.files['solo-dm-save.json'].content;
                 const cloudData = JSON.parse(content);
 
-                // Replace local data with cloud data
-                saveToStorage('users', cloudData);
+                // Handle both old format (just users) and new format (users + admin settings)
+                if (cloudData.users) {
+                    // New format with admin settings
+                    saveToStorage('users', cloudData.users);
+
+                    // Restore admin settings
+                    if (cloudData.adminSettings) {
+                        if (cloudData.adminSettings.globalApiKey) {
+                            saveToStorage('globalApiKey', cloudData.adminSettings.globalApiKey);
+                        }
+                        if (cloudData.adminSettings.adminPassword) {
+                            saveToStorage('adminPassword', cloudData.adminSettings.adminPassword);
+                        }
+                        if (cloudData.adminSettings.adminCloudSyncEnabled !== undefined) {
+                            saveToStorage('adminCloudSyncEnabled', cloudData.adminSettings.adminCloudSyncEnabled);
+                        }
+                    }
+
+                    console.log('[Cloud] Loaded data version:', cloudData.version);
+                } else {
+                    // Old format - just users object
+                    saveToStorage('users', cloudData);
+                }
 
                 alert('All user data loaded from cloud successfully!');
 
@@ -2929,9 +2963,32 @@ INSTRUCTIONS:
             const content = gist.files['solo-dm-save.json'].content;
             const cloudData = JSON.parse(content);
 
-            // Replace local data with cloud data
-            saveToStorage('users', cloudData);
-            console.log('[Cloud Sync] Data loaded from cloud successfully');
+            // Handle both old format (just users) and new format (users + admin settings)
+            if (cloudData.users) {
+                // New format with admin settings
+                saveToStorage('users', cloudData.users);
+
+                // Restore admin settings
+                if (cloudData.adminSettings) {
+                    if (cloudData.adminSettings.globalApiKey) {
+                        saveToStorage('globalApiKey', cloudData.adminSettings.globalApiKey);
+                        console.log('[Cloud Sync] ✓ Restored global API key');
+                    }
+                    if (cloudData.adminSettings.adminPassword) {
+                        saveToStorage('adminPassword', cloudData.adminSettings.adminPassword);
+                        console.log('[Cloud Sync] ✓ Restored admin password');
+                    }
+                    if (cloudData.adminSettings.adminCloudSyncEnabled !== undefined) {
+                        saveToStorage('adminCloudSyncEnabled', cloudData.adminSettings.adminCloudSyncEnabled);
+                    }
+                }
+
+                console.log('[Cloud Sync] Data loaded from cloud (version:', cloudData.version, ')');
+            } else {
+                // Old format - just users object
+                saveToStorage('users', cloudData);
+                console.log('[Cloud Sync] Data loaded from cloud (old format)');
+            }
         }
 
         function exportData() {
