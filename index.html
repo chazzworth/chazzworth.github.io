@@ -717,42 +717,6 @@
             </div>
 
             <div class="card">
-                <h2 class="card-title">☁️ Cloud Sync (GitHub Gist)</h2>
-                <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9rem;">
-                    Automatically sync your data across all devices using GitHub Gist.
-                </p>
-
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="useCloudSync" style="width: auto; margin: 0;">
-                        Enable Cloud Sync
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label>GitHub Personal Access Token</label>
-                    <input type="password" id="githubToken" placeholder="ghp_...">
-                    <p style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.5rem;">
-                        Create a token at <a href="https://github.com/settings/tokens/new?description=Solo%20DM&scopes=gist" target="_blank" style="color: var(--text-gold);">github.com/settings/tokens</a> with "gist" scope
-                    </p>
-                </div>
-
-                <div class="form-group">
-                    <label>Gist ID (auto-filled after first sync)</label>
-                    <input type="text" id="gistId" placeholder="Auto-generated on first sync" readonly>
-                </div>
-
-                <div class="flex flex-gap" style="margin-top: 1rem;">
-                    <button class="btn" onclick="syncToCloud()">☁️ Sync Now</button>
-                    <button class="btn btn-secondary" onclick="loadFromCloud()">⬇️ Load from Cloud</button>
-                </div>
-
-                <p style="color: var(--secondary); font-size: 0.85rem; margin-top: 1rem;">
-                    When enabled, your data automatically syncs after each game session. Free and private!
-                </p>
-            </div>
-
-            <div class="card">
                 <h2 class="card-title">🤖 AI Dungeon Master</h2>
                 <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9rem;">
                     Enable Claude AI for truly dynamic, contextual DM responses instead of procedural generation.
@@ -778,8 +742,9 @@
                 </div>
 
                 <details style="margin-top: 1rem;" id="adminSection">
-                    <summary style="cursor: pointer; color: var(--text-gold); font-weight: 600;" onclick="checkAdminAccess(event)">🔑 Admin: Configure Global API Key</summary>
+                    <summary style="cursor: pointer; color: var(--text-gold); font-weight: 600;" onclick="checkAdminAccess(event)">🔑 Admin: Global Settings & Cloud Sync</summary>
                     <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 6px;" id="adminContent">
+                        <h3 style="color: var(--text-gold); margin-bottom: 0.5rem;">🤖 Global AI Configuration</h3>
                         <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
                             Admins can set a global API key that ALL users can use. This allows everyone to enjoy AI responses without needing their own key.
                         </p>
@@ -794,6 +759,45 @@
                         <p style="color: var(--accent); font-size: 0.85rem; margin-top: 1rem;">
                             ⚠️ This key will be used by all users. API costs will be charged to this account.
                         </p>
+
+                        <hr style="margin: 1.5rem 0; border-color: var(--border);">
+
+                        <h3 style="color: var(--text-gold); margin-bottom: 0.5rem;">☁️ Global Cloud Sync</h3>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Configure cloud sync for ALL users. When enabled, all user data automatically syncs to GitHub Gist after sessions. Users don't need to configure anything!
+                        </p>
+
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="adminEnableCloudSync" style="width: auto; margin: 0;">
+                                Enable Automatic Cloud Sync for All Users
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>GitHub Personal Access Token</label>
+                            <input type="password" id="adminGithubToken" placeholder="ghp_...">
+                            <p style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.5rem;">
+                                Create a token at <a href="https://github.com/settings/tokens/new?description=Solo%20DM&scopes=gist" target="_blank" style="color: var(--text-gold);">github.com/settings/tokens</a> with "gist" scope
+                            </p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gist ID (auto-filled after first sync)</label>
+                            <input type="text" id="adminGistId" placeholder="Auto-generated on first sync" readonly>
+                        </div>
+
+                        <button class="btn" onclick="saveAdminCloudSettings()">Save Cloud Sync Settings</button>
+
+                        <div class="flex flex-gap" style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" onclick="adminSyncNow()">☁️ Sync All Users Now</button>
+                            <button class="btn btn-secondary" onclick="adminLoadFromCloud()">⬇️ Load from Cloud</button>
+                        </div>
+
+                        <p style="color: var(--accent); font-size: 0.85rem; margin-top: 1rem;">
+                            ⚠️ All user data will be automatically synced to your GitHub account. Keep your token secure!
+                        </p>
+
                         <hr style="margin: 1.5rem 0; border-color: var(--border);">
                         <button class="btn btn-secondary" onclick="changeAdminPassword()">Change Admin Password</button>
                     </div>
@@ -1053,6 +1057,10 @@
             };
 
             saveToStorage('users', users);
+
+            // Auto-sync new user to cloud
+            autoSyncIfEnabled();
+
             alert('Registration successful! Please login.');
             showLogin();
         }
@@ -1075,10 +1083,17 @@
 
             currentUser = username;
             saveToStorage('currentUser', username);
+
+            // Auto-sync on login to get latest cloud data
+            autoSyncIfEnabled();
+
             showMainMenu();
         }
 
         function logout() {
+            // Auto-sync before logout to save any changes
+            autoSyncIfEnabled();
+
             currentUser = null;
             currentCharacter = null;
             gameSession = null;
@@ -2240,11 +2255,6 @@ INSTRUCTIONS:
                 statusEl.style.color = 'var(--secondary)';
             }
 
-            // Load cloud sync settings
-            document.getElementById('useCloudSync').checked = settings.useCloudSync || false;
-            document.getElementById('githubToken').value = settings.githubToken || '';
-            document.getElementById('gistId').value = settings.gistId || '';
-
             showScreen('settingsScreen');
         }
 
@@ -2257,10 +2267,7 @@ INSTRUCTIONS:
                 difficulty: document.getElementById('difficulty').value,
                 setting: document.getElementById('setting').value,
                 useAI: useAI,
-                aiModel: document.getElementById('aiModel').value,
-                useCloudSync: document.getElementById('useCloudSync').checked,
-                githubToken: document.getElementById('githubToken').value.trim(),
-                gistId: document.getElementById('gistId').value.trim()
+                aiModel: document.getElementById('aiModel').value
             };
 
             // Update global AI config
@@ -2269,14 +2276,9 @@ INSTRUCTIONS:
 
             saveToStorage('users', users);
 
-            // Auto-sync if cloud sync is enabled
-            if (users[currentUser].settings.useCloudSync && users[currentUser].settings.githubToken) {
-                syncToCloud(true);
-            } else {
-                const effectiveKey = getEffectiveApiKey();
-                alert(useAI && effectiveKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
-                showMainMenu();
-            }
+            const effectiveKey = getEffectiveApiKey();
+            alert(useAI && effectiveKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
+            showMainMenu();
         }
 
         function checkAdminAccess(event) {
@@ -2318,9 +2320,25 @@ INSTRUCTIONS:
                 return false;
             }
 
-            // Allow opening
+            // Allow opening and load admin settings
             details.setAttribute('open', '');
+            loadAdminSettings();
             return false;
+        }
+
+        function loadAdminSettings() {
+            // Load global API key
+            const globalApiKey = loadFromStorage('globalApiKey') || '';
+            document.getElementById('adminApiKey').value = globalApiKey;
+
+            // Load cloud sync settings
+            const cloudSyncEnabled = loadFromStorage('adminCloudSyncEnabled') || false;
+            const githubToken = loadFromStorage('adminGithubToken') || '';
+            const gistId = loadFromStorage('adminGistId') || '';
+
+            document.getElementById('adminEnableCloudSync').checked = cloudSyncEnabled;
+            document.getElementById('adminGithubToken').value = githubToken;
+            document.getElementById('adminGistId').value = gistId;
         }
 
         function changeAdminPassword() {
@@ -2375,6 +2393,144 @@ INSTRUCTIONS:
             showSettings(); // Refresh to update status
         }
 
+        function saveAdminCloudSettings() {
+            const enabled = document.getElementById('adminEnableCloudSync').checked;
+            const token = document.getElementById('adminGithubToken').value.trim();
+            const gistId = document.getElementById('adminGistId').value.trim();
+
+            // Save settings
+            saveToStorage('adminCloudSyncEnabled', enabled);
+            saveToStorage('adminGithubToken', token);
+            saveToStorage('adminGistId', gistId);
+
+            alert('Cloud sync settings saved!\n\n' +
+                  (enabled && token ? 'Auto-sync is now enabled for all users.' :
+                   'Auto-sync is disabled. Configure token to enable.'));
+
+            // Auto-sync if enabled and token is provided
+            if (enabled && token) {
+                adminSyncNow(true);
+            }
+        }
+
+        async function adminSyncNow(silent = false) {
+            const token = loadFromStorage('adminGithubToken');
+            if (!token) {
+                alert('Please configure GitHub token in admin settings');
+                return;
+            }
+
+            try {
+                const users = loadFromStorage('users');
+                const data = JSON.stringify(users, null, 2);
+                const gistData = {
+                    description: 'Solo Dungeon Master - All Users Data',
+                    public: false,
+                    files: {
+                        'solo-dm-save.json': {
+                            content: data
+                        }
+                    }
+                };
+
+                let gistId = loadFromStorage('adminGistId');
+                let response;
+
+                if (gistId) {
+                    // Update existing gist
+                    response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        },
+                        body: JSON.stringify(gistData)
+                    });
+                } else {
+                    // Create new gist
+                    response = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        },
+                        body: JSON.stringify(gistData)
+                    });
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('GitHub API Error:', response.status, errorData);
+                    throw new Error(`GitHub API Error ${response.status}: ${errorData.message || 'Unknown error'}`);
+                }
+
+                const gist = await response.json();
+
+                // Save gist ID if it's new
+                if (!gistId) {
+                    saveToStorage('adminGistId', gist.id);
+                    document.getElementById('adminGistId').value = gist.id;
+                }
+
+                if (!silent) {
+                    alert('All user data synced to cloud successfully!');
+                }
+            } catch (error) {
+                console.error('Cloud sync error:', error);
+                alert(`Failed to sync to cloud:\n\n${error.message}\n\nCheck console for details.`);
+            }
+        }
+
+        async function adminLoadFromCloud() {
+            const token = loadFromStorage('adminGithubToken');
+            const gistId = loadFromStorage('adminGistId');
+
+            if (!token) {
+                alert('Please configure GitHub token in admin settings');
+                return;
+            }
+
+            if (!gistId) {
+                alert('No Gist ID found. Please sync data first to create a gist.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('GitHub API Error:', response.status, errorData);
+                    throw new Error(`GitHub API Error ${response.status}: ${errorData.message || 'Unknown error'}`);
+                }
+
+                const gist = await response.json();
+                const content = gist.files['solo-dm-save.json'].content;
+                const cloudData = JSON.parse(content);
+
+                // Replace local data with cloud data
+                saveToStorage('users', cloudData);
+
+                alert('All user data loaded from cloud successfully!');
+
+                // If not logged in, show login screen
+                if (!currentUser) {
+                    showLogin();
+                }
+            } catch (error) {
+                console.error('Cloud load error:', error);
+                alert(`Failed to load from cloud:\n\n${error.message}\n\nCheck console for details.`);
+            }
+        }
+
         function exportData() {
             const users = loadFromStorage('users');
             if (!users || Object.keys(users).length === 0) {
@@ -2423,140 +2579,14 @@ INSTRUCTIONS:
             reader.readAsText(file);
         }
 
-        async function syncToCloud(silent = false) {
-            const users = loadFromStorage('users');
-            if (!currentUser || !users[currentUser]) {
-                alert('Please log in first');
-                return;
-            }
-
-            const settings = users[currentUser].settings;
-            if (!settings.githubToken) {
-                alert('Please configure your GitHub token in settings');
-                return;
-            }
-
-            try {
-                const data = JSON.stringify(users, null, 2);
-                const gistData = {
-                    description: 'Solo Dungeon Master - Save Data',
-                    public: false,
-                    files: {
-                        'solo-dm-save.json': {
-                            content: data
-                        }
-                    }
-                };
-
-                let response;
-                if (settings.gistId) {
-                    // Update existing gist
-                    response = await fetch(`https://api.github.com/gists/${settings.gistId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${settings.githubToken}`,
-                            'Accept': 'application/vnd.github+json',
-                            'X-GitHub-Api-Version': '2022-11-28'
-                        },
-                        body: JSON.stringify(gistData)
-                    });
-                } else {
-                    // Create new gist
-                    response = await fetch('https://api.github.com/gists', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${settings.githubToken}`,
-                            'Accept': 'application/vnd.github+json',
-                            'X-GitHub-Api-Version': '2022-11-28'
-                        },
-                        body: JSON.stringify(gistData)
-                    });
-                }
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error('GitHub API Error:', response.status, errorData);
-                    throw new Error(`GitHub API Error ${response.status}: ${errorData.message || 'Unknown error'}`);
-                }
-
-                const gist = await response.json();
-
-                // Save gist ID if it's new
-                if (!settings.gistId) {
-                    users[currentUser].settings.gistId = gist.id;
-                    saveToStorage('users', users);
-                    document.getElementById('gistId').value = gist.id;
-                }
-
-                if (!silent) {
-                    alert('Data synced to cloud successfully!');
-                    showMainMenu();
-                }
-            } catch (error) {
-                console.error('Cloud sync error:', error);
-                alert(`Failed to sync to cloud:\n\n${error.message}\n\nCheck console for details.`);
-            }
-        }
-
-        async function loadFromCloud() {
-            const users = loadFromStorage('users') || {};
-            const token = document.getElementById('githubToken').value.trim();
-            const gistId = document.getElementById('gistId').value.trim();
-
-            if (!token) {
-                alert('Please enter your GitHub token');
-                return;
-            }
-
-            if (!gistId) {
-                alert('Please enter your Gist ID. You can find it in the Gist URL after first sync.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/vnd.github+json',
-                        'X-GitHub-Api-Version': '2022-11-28'
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error('GitHub API Error:', response.status, errorData);
-                    throw new Error(`GitHub API Error ${response.status}: ${errorData.message || 'Unknown error'}`);
-                }
-
-                const gist = await response.json();
-                const content = gist.files['solo-dm-save.json'].content;
-                const cloudData = JSON.parse(content);
-
-                // Merge cloud data with local
-                const mergedUsers = { ...users, ...cloudData };
-                saveToStorage('users', mergedUsers);
-
-                alert('Data loaded from cloud successfully!');
-
-                // If not logged in, show login screen
-                if (!currentUser) {
-                    showLogin();
-                }
-            } catch (error) {
-                console.error('Cloud load error:', error);
-                alert(`Failed to load from cloud:\n\n${error.message}\n\nCheck console for details.`);
-            }
-        }
-
-        // Auto-sync after game sessions
+        // Auto-sync after game sessions using admin-configured cloud sync
         function autoSyncIfEnabled() {
-            if (!currentUser) return;
+            const enabled = loadFromStorage('adminCloudSyncEnabled');
+            const token = loadFromStorage('adminGithubToken');
+            const gistId = loadFromStorage('adminGistId');
 
-            const users = loadFromStorage('users');
-            const settings = users[currentUser]?.settings;
-
-            if (settings?.useCloudSync && settings?.githubToken && settings?.gistId) {
-                syncToCloud(true).catch(err => console.error('Auto-sync failed:', err));
+            if (enabled && token && gistId) {
+                adminSyncNow(true).catch(err => console.error('Auto-sync failed:', err));
             }
         }
 
