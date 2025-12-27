@@ -742,34 +742,119 @@
             'Wild Coast', 'Gnarley Forest', 'Cairn Hills', 'Abbor-Alz'
         ];
 
-        // Encounter tables
-        const ENCOUNTER_TABLES = {
-            dungeon: ['Goblin patrol', 'Orc warriors', 'Skeleton guards', 'Giant rats', 'Trapped corridor', 'Empty chamber', 'Treasure chest', 'Wandering merchant'],
-            wilderness: ['Bandits', 'Wild animals', 'Traveling merchants', 'Mysterious stranger', 'Ruins', 'Cave entrance', 'Ancient shrine', 'Monster tracks'],
-            town: ['Suspicious guard', 'Helpful innkeeper', 'Mysterious hooded figure', 'Local merchant', 'Town crier', 'Drunk patron', 'Street urchin', 'Noble in disguise']
-        };
+        // Enhanced DM Content Database
+        const DM_CONTENT = {
+            locations: {
+                tavern: ['The Prancing Pony', 'The Green Dragon', 'The Slumbering Drake', 'The Golden Griffin', 'The Rusty Nail', 'The Silver Stag'],
+                dungeon: ['Crypts of Zagyg', 'The Howling Caves', 'Blackstone Prison', 'The Sunless Citadel', 'Tomb of Horrors', 'The Moathouse Ruins'],
+                wilderness: ['Gnarley Forest', 'Dim Forest', 'Kron Hills', 'Abbor-Alz', 'Bright Desert', 'Vesve Forest'],
+                ruins: ['Temple of Elemental Evil', 'Castle Greyhawk', 'The Lost Temple', 'Maure Castle', 'Tower of Zagig']
+            },
 
-        // Story templates
-        const STORY_TEMPLATES = [
-            {
-                type: 'quest',
-                hooks: [
-                    'A desperate villager approaches you, seeking help with a monster terrorizing the area.',
-                    'You discover a mysterious map pointing to ancient ruins.',
-                    'A dying messenger hands you a sealed letter marked "URGENT".',
-                    'The local lord offers a generous reward for a dangerous task.'
+            npcNames: {
+                male: ['Elric', 'Gareth', 'Thorne', 'Aldric', 'Brom', 'Cedric', 'Dain', 'Erik', 'Finn', 'Godfrey', 'Haldor', 'Ivan', 'Joran', 'Kellan', 'Lars'],
+                female: ['Aria', 'Brenna', 'Celeste', 'Diana', 'Elena', 'Freya', 'Giselle', 'Helga', 'Isolde', 'Janine', 'Kiera', 'Lyra', 'Mira', 'Nessa'],
+                fantasy: ['Xandros', 'Zephyr', 'Mordecai', 'Thaddeus', 'Oberon', 'Ragnar', 'Soren', 'Valtor', 'Wyrmwood', 'Zoltan']
+            },
+
+            npcPersonalities: [
+                { trait: 'nervous and twitchy', speech: 'speaks quickly and glances around constantly' },
+                { trait: 'gruff but kind-hearted', speech: 'speaks in short, clipped sentences but smiles warmly' },
+                { trait: 'mysterious and cryptic', speech: 'chooses words carefully, often speaking in riddles' },
+                { trait: 'jovial and loud', speech: 'laughs heartily and slaps backs' },
+                { trait: 'scholarly and precise', speech: 'uses elaborate vocabulary and corrects others' },
+                { trait: 'suspicious and paranoid', speech: 'whispers and looks over their shoulder' },
+                { trait: 'aggressive and confrontational', speech: 'speaks with barely contained anger' },
+                { trait: 'charming and persuasive', speech: 'uses honeyed words and flattery' },
+                { trait: 'world-weary and cynical', speech: 'sighs often and expects the worst' },
+                { trait: 'enthusiastic and naive', speech: 'speaks with wide-eyed wonder' }
+            ],
+
+            questTypes: [
+                { type: 'rescue', objective: 'rescue someone from danger', reward: 'gratitude and gold' },
+                { type: 'retrieve', objective: 'recover a lost or stolen item', reward: 'a finder\'s fee or the item itself' },
+                { type: 'eliminate', objective: 'defeat a threatening creature or villain', reward: 'bounty and local fame' },
+                { type: 'escort', objective: 'safely escort someone to their destination', reward: 'payment and information' },
+                { type: 'investigate', objective: 'uncover the truth behind mysterious events', reward: 'knowledge and allies' },
+                { type: 'explore', objective: 'map or explore a dangerous location', reward: 'whatever treasures you find' },
+                { type: 'defend', objective: 'protect a location from attack', reward: 'the gratitude of those saved' },
+                { type: 'deliver', objective: 'deliver an important message or package', reward: 'payment and potential secrets' }
+            ],
+
+            enemies: [
+                { name: 'Orc Raider', description: 'scarred and battle-hardened', threat: 'medium', tactics: 'charges recklessly with a battle cry' },
+                { name: 'Goblin Ambusher', description: 'small but cunning', threat: 'low', tactics: 'strikes from shadows then retreats' },
+                { name: 'Skeletal Warrior', description: 'ancient and relentless', threat: 'medium', tactics: 'advances slowly, immune to fear' },
+                { name: 'Bandit Captain', description: 'well-armed and confident', threat: 'high', tactics: 'fights strategically, calling for backup' },
+                { name: 'Giant Spider', description: 'the size of a horse', threat: 'high', tactics: 'attempts to web you before striking' },
+                { name: 'Zombie', description: 'rotting and mindless', threat: 'low', tactics: 'shambles forward, ignoring pain' },
+                { name: 'Hobgoblin Sergeant', description: 'disciplined and armored', threat: 'high', tactics: 'fights with military precision' },
+                { name: 'Shadow', description: 'incorporeal and chilling', threat: 'very high', tactics: 'drains your strength with its touch' },
+                { name: 'Gnoll Scavenger', description: 'hyena-like and savage', threat: 'medium', tactics: 'fights in a pack, targeting the weak' },
+                { name: 'Cultist', description: 'fanatical and wild-eyed', threat: 'medium', tactics: 'chants dark prayers while attacking' }
+            ],
+
+            treasures: [
+                'a leather pouch containing ancient gold coins worth 3d6×10 gp',
+                'a silver ring engraved with arcane symbols (possibly magical)',
+                'a well-crafted longsword with a griffin emblem on the pommel',
+                'a scroll case containing a map to a nearby dungeon',
+                'a potion in a crystal vial that glows faintly blue',
+                'a small gemstone that catches the light beautifully (worth 50-200 gp)',
+                'an old journal written in a strange language',
+                'a masterwork dagger with a bone handle',
+                'a holy symbol made of pure silver',
+                'a set of fine lockpicks wrapped in black leather',
+                'an ornate amulet depicting a dragon',
+                'a weathered spellbook with several pages torn out',
+                'a compass that always points toward the nearest temple',
+                'a cloak that seems to shimmer in the moonlight'
+            ],
+
+            environmentDetails: {
+                dungeon: [
+                    'The walls are slick with moisture and covered in phosphorescent moss',
+                    'Ancient murals depict battles between gods and demons',
+                    'The air smells of decay and forgotten centuries',
+                    'Chains hang from the ceiling, swaying slightly despite the still air',
+                    'Strange symbols glow faintly in the darkness',
+                    'The floor is littered with the bones of previous explorers',
+                    'Water drips steadily, echoing through empty corridors',
+                    'Scratches mar the stonework, as if something clawed at the walls'
+                ],
+                wilderness: [
+                    'The forest is unnaturally quiet - even the birds have ceased their songs',
+                    'Mist clings to the ground, obscuring your feet as you walk',
+                    'Ancient trees tower overhead, their branches forming a dense canopy',
+                    'The path ahead is overgrown and barely visible',
+                    'Strange fungi grow in vibrant colors along the tree trunks',
+                    'You hear the distant howl of wolves',
+                    'The undergrowth rustles with unseen movement',
+                    'A stream babbles nearby, its water crystal clear'
+                ],
+                town: [
+                    'The streets are busy with merchants hawking their wares',
+                    'Guards patrol in pairs, eyeing strangers suspiciously',
+                    'The smell of fresh bread wafts from a nearby bakery',
+                    'Children play in the streets, chasing a stray dog',
+                    'Town criers announce the latest news and proclamations',
+                    'The marketplace bustles with activity and haggling',
+                    'A gallows stands in the town square, a grim reminder',
+                    'Beggars line the alleyways, watching passersby hopefully'
                 ]
             },
-            {
-                type: 'dungeon',
-                descriptions: [
-                    'ancient crypt filled with restless undead',
-                    'forgotten temple dedicated to a dark deity',
-                    'natural cave system inhabited by monsters',
-                    'abandoned wizard\'s tower crackling with magic'
-                ]
-            }
-        ];
+
+            complications: [
+                'but you notice something suspicious about the situation',
+                'however, you\'re not the only one interested in this',
+                'though time is clearly of the essence',
+                'but there may be more to this than meets the eye',
+                'yet something feels wrong about all of this',
+                'although you sense hidden dangers ahead',
+                'but the cost of failure would be dire',
+                'however, trust may be in short supply here'
+            ]
+        };
 
         // ========================================
         // UTILITY FUNCTIONS
@@ -1215,6 +1300,46 @@
             }, 1000);
         }
 
+        // ========================================
+        // ENHANCED DM RESPONSE SYSTEM
+        // ========================================
+
+        function random(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function generateNPC() {
+            const gender = Math.random() > 0.5 ? 'male' : 'female';
+            const nameType = Math.random() > 0.7 ? 'fantasy' : gender;
+            const name = random(DM_CONTENT.npcNames[nameType]);
+            const personality = random(DM_CONTENT.npcPersonalities);
+
+            return {
+                name,
+                personality: personality.trait,
+                speech: personality.speech,
+                gender
+            };
+        }
+
+        function getContextualEnvironment() {
+            const recentActions = gameSession.narrative.slice(-5);
+            const hasExploredDungeon = recentActions.some(n =>
+                n.text.toLowerCase().includes('dungeon') ||
+                n.text.toLowerCase().includes('crypt') ||
+                n.text.toLowerCase().includes('cave')
+            );
+            const inTown = recentActions.some(n =>
+                n.text.toLowerCase().includes('town') ||
+                n.text.toLowerCase().includes('city') ||
+                n.text.toLowerCase().includes('village')
+            );
+
+            if (hasExploredDungeon) return 'dungeon';
+            if (inTown) return 'town';
+            return 'wilderness';
+        }
+
         function generateDMResponse(playerAction) {
             const users = loadFromStorage('users');
             const settings = users[currentUser].settings;
@@ -1223,206 +1348,630 @@
             // Increment encounter count
             gameSession.encounterCount++;
 
-            // Parse action intent
-            if (action.includes('look') || action.includes('examine') || action.includes('search')) {
-                return generateExaminationResponse();
-            } else if (action.includes('talk') || action.includes('speak') || action.includes('ask')) {
-                return generateConversationResponse();
-            } else if (action.includes('attack') || action.includes('fight') || action.includes('combat')) {
+            // Initialize session context if needed
+            if (!gameSession.context) {
+                gameSession.context = {
+                    activeQuests: [],
+                    knownNPCs: [],
+                    recentEvents: [],
+                    discoveredLocations: []
+                };
+            }
+
+            // Determine environment and context
+            const environment = getContextualEnvironment();
+
+            // Parse action intent with much more variety
+            if (action.match(/\b(look|examine|inspect|search|investigate|study|peer|scan)\b/)) {
+                return generateExaminationResponse(environment, action);
+            } else if (action.match(/\b(talk|speak|ask|question|inquire|converse|chat|discuss)\b/)) {
+                return generateConversationResponse(action);
+            } else if (action.match(/\b(attack|fight|strike|hit|combat|charge|assault|ambush)\b/)) {
                 return generateCombatResponse();
-            } else if (action.includes('go') || action.includes('move') || action.includes('travel') || action.includes('enter')) {
-                return generateMovementResponse();
-            } else if (action.includes('take') || action.includes('grab') || action.includes('pick up')) {
+            } else if (action.match(/\b(go|move|walk|travel|head|journey|venture|enter|exit|leave)\b/)) {
+                return generateMovementResponse(action);
+            } else if (action.match(/\b(take|grab|pick|acquire|collect|gather|loot|steal)\b/)) {
                 return generateItemResponse();
-            } else if (action.includes('cast') || action.includes('spell')) {
+            } else if (action.match(/\b(cast|spell|magic|conjure|invoke|summon)\b/)) {
                 return generateSpellResponse();
+            } else if (action.match(/\b(rest|sleep|camp|recover)\b/)) {
+                return generateRestResponse();
+            } else if (action.match(/\b(help|aid|assist|rescue|save)\b/)) {
+                return generateHelpResponse();
+            } else if (action.match(/\b(hide|sneak|stealth|creep)\b/)) {
+                return generateStealthResponse();
+            } else if (action.match(/\b(listen|hear|eavesdrop)\b/)) {
+                return generateListeningResponse(environment);
             } else {
-                return generateGeneralResponse();
+                return generateGeneralResponse(action);
             }
         }
 
-        function generateExaminationResponse() {
-            const responses = [
-                `You carefully examine the area. ${generateRoomDescription()} You notice ${generateDiscovery()}.`,
-                `Your ${currentCharacter.race} eyes scan the surroundings. ${generateRoomDescription()} Something catches your attention: ${generateDiscovery()}.`,
-                `As you investigate, ${generateRoomDescription()} Your search reveals ${generateDiscovery()}.`
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
+        function generateExaminationResponse(environment, action) {
+            const envDetail = random(DM_CONTENT.environmentDetails[environment]);
+            const wisdom = currentCharacter.abilities.Wisdom;
+            const intel = currentCharacter.abilities.Intelligence;
 
-        function generateRoomDescription() {
-            const descriptions = [
-                'The chamber is dimly lit by flickering torches.',
-                'Ancient stonework surrounds you, covered in mysterious runes.',
-                'The air is damp and musty, speaking of ages long past.',
-                'Shadows dance along the walls as your torch illuminates the space.',
-                'The room is surprisingly well-preserved, despite its age.'
-            ];
-            return descriptions[Math.floor(Math.random() * descriptions.length)];
-        }
+            // High Wisdom/Int characters notice more
+            const noticeBonus = wisdom + intel > 30 ? 2 : wisdom + intel > 24 ? 1 : 0;
 
-        function generateDiscovery() {
             const discoveries = [
-                'a hidden alcove containing a dusty chest',
-                'fresh footprints leading deeper into the darkness',
-                'ancient writing etched into the stone',
-                'a glint of metal partially buried in debris',
-                'signs of recent passage through this area',
-                'a strange symbol carved into the floor',
-                'the faint sound of dripping water echoing from ahead'
+                `${envDetail}. Your keen ${currentCharacter.race} senses detect ${random([
+                    'scratch marks on the wall - something with claws passed through recently',
+                    'a draft of air suggesting a hidden passage nearby',
+                    'the faint scent of sulfur lingering in the air',
+                    'disturbed dust patterns indicating recent activity',
+                    'a loose stone in the wall that might conceal something'
+                ])}`,
+
+                `As a ${currentCharacter.class}, your training proves useful here. ${envDetail}. You discover ${random([
+                    random(DM_CONTENT.treasures),
+                    'tracks leading deeper into the unknown',
+                    'evidence of a campsite - someone else has been here',
+                    'strange markings that might be a warning... or a map',
+                    'a hidden cache containing supplies and a cryptic note'
+                ])}`,
+
+                `${envDetail}. Your investigation reveals more than you expected: ${random([
+                    'this place has been looted before, but hastily - perhaps the looters fled from something',
+                    'signs of a struggle - dried blood stains the floor',
+                    'fresh torch marks on the walls suggest others are here now',
+                    'an intricate trap mechanism, currently disarmed but still dangerous-looking',
+                    'writings in multiple languages, including one you don\'t recognize'
+                ])}`,
             ];
-            return discoveries[Math.floor(Math.random() * discoveries.length)];
+
+            if (noticeBonus > 0) {
+                discoveries.push(
+                    `Your exceptional perception (Wisdom ${wisdom}, Intelligence ${intel}) allows you to notice what others would miss: ${random([
+                        'a nearly invisible tripwire connected to a crossbow trap',
+                        'a secret compartment built into the architecture',
+                        'the subtle pattern of footprints - someone is trying not to be followed',
+                        'a magical aura emanating from something nearby'
+                    ])}. ${envDetail}.`
+                );
+            }
+
+            // Sometimes trigger an event
+            if (Math.random() < 0.25) {
+                discoveries.push(
+                    `${envDetail}. But your examination hasn't gone unnoticed - ${random([
+                        'you hear footsteps approaching from the shadows',
+                        'a distant alarm bell begins to ring',
+                        'something stirs in the darkness ahead',
+                        'you\'ve triggered something... you hear a mechanical click'
+                    ])}`
+                );
+            }
+
+            return random(discoveries);
         }
 
-        function generateConversationResponse() {
-            const responses = [
-                `A weathered ${generateNPC()} regards you with interest. "Greetings, traveler," they say. "What brings a ${currentCharacter.class} to these parts?"`,
-                `You approach ${generateNPC()} who eyes you cautiously before speaking: "${generateNPCDialogue()}"`,
-                `${generateNPC()} turns to face you. Their expression is difficult to read as they say, "${generateNPCDialogue()}"`
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
+        function generateConversationResponse(action) {
+            const npc = generateNPC();
+            const charisma = currentCharacter.abilities.Charisma;
+            const charismaMod = getAbilityModifier(charisma);
 
-        function generateNPC() {
-            const npcs = [
-                'merchant', 'guard', 'innkeeper', 'traveler', 'priest',
-                'mysterious hooded figure', 'local farmer', 'town elder',
-                'wandering minstrel', 'blacksmith'
-            ];
-            return npcs[Math.floor(Math.random() * npcs.length)];
-        }
+            // Store NPC for potential quest hooks
+            if (!gameSession.context.knownNPCs.find(n => n.name === npc.name)) {
+                gameSession.context.knownNPCs.push(npc);
+            }
 
-        function generateNPCDialogue() {
-            const dialogues = [
-                "These are dangerous times. I'd watch myself if I were you.",
-                "Have you heard the rumors? Strange things happening lately.",
-                "You look capable. We could use someone like you around here.",
-                "Be careful in the ruins to the north. Many have entered, few have returned.",
-                "Welcome to our humble establishment. What can I do for you?"
+            // Generate quest hook 30% of the time
+            const offersQuest = Math.random() < 0.3;
+            const quest = offersQuest ? random(DM_CONTENT.questTypes) : null;
+
+            const greetings = [
+                `You encounter ${npc.name}, a ${npc.personality} ${random(['merchant', 'traveler', 'local', 'stranger', 'guard'])}. They ${npc.speech} as they address you.`,
+                `${npc.name} notices your approach. The ${npc.personality} figure regards you with ${random(['curiosity', 'suspicion', 'interest', 'wariness', 'hope'])}.`,
+                `A ${npc.personality} individual introduces themselves as ${npc.name}. They ${npc.speech}.`
             ];
-            return dialogues[Math.floor(Math.random() * dialogues.length)];
+
+            const dialogueOptions = [
+                `"Well met, ${currentCharacter.name}. A ${currentCharacter.race} ${currentCharacter.class} - ${random([
+                    'we don\'t see many of your kind here',
+                    'impressive. The tales of your kind are legendary',
+                    'you might be exactly what we need',
+                    'interesting timing for someone like you to arrive'
+                ])}."`,
+
+                `"${random(['Greetings', 'Well met', 'Good day', 'Hail'])} adventurer. These are ${random([
+                    'troubled times',
+                    'strange days',
+                    'dark hours',
+                    'uncertain times'
+                ])}. ${random([
+                    'The roads are not safe',
+                    'Danger lurks in unexpected places',
+                    'Old evils are stirring',
+                    'We need heroes now more than ever'
+                ])}."`,
+
+                `"A ${currentCharacter.class}? ${random([
+                    'Your skills may prove valuable',
+                    'Perhaps fate has brought you here',
+                    'The gods smile upon our meeting',
+                    'This is fortuitous indeed'
+                ])}. ${random([
+                    'There are matters that require someone of your talents',
+                    'I have heard troubling rumors lately',
+                    'Strange events have been occurring',
+                    'Something evil stirs in these lands'
+                ])}."`,
+            ];
+
+            let response = `${random(greetings)} ${random(dialogueOptions)}`;
+
+            // Add quest offer if applicable
+            if (quest) {
+                const complication = random(DM_CONTENT.complications);
+                response += `\n\n"${random([
+                    'I have a proposition for you',
+                    'Perhaps you can help with a matter',
+                    'I need someone capable of handling a delicate situation',
+                    'There\'s work for one such as you, if you\'re interested'
+                ])}: ${quest.objective}. The reward would be ${quest.reward}, ${complication}. What say you?"`;
+
+                // Store quest
+                gameSession.context.activeQuests.push({
+                    giver: npc.name,
+                    type: quest.type,
+                    objective: quest.objective,
+                    reward: quest.reward,
+                    active: false
+                });
+            }
+
+            // High Charisma characters get additional information
+            if (charismaMod > 1) {
+                response += `\n\n(Your high Charisma (${charisma}) makes ${npc.name} more talkative. They add: "${random([
+                    'Between you and me, there\'s more to this than I\'m letting on',
+                    'I\'ve heard whispers of treasure in the old ruins',
+                    'The local lord has been acting strangely of late',
+                    'Trust no one in this town - not everyone is who they seem',
+                    'There\'s an ancient map in the library that might interest you'
+                ])}")`;
+            }
+
+            return response;
         }
 
         function generateCombatResponse() {
-            const enemy = generateEnemy();
-            const responses = [
-                `As you ready your weapon, ${enemy} emerges from the shadows! Roll for initiative! (The creature appears ${generateThreatLevel()})`,
-                `Your combat instincts kick in just as ${enemy} attacks! You must act quickly! (${generateThreatLevel()})`,
-                `${enemy} stands before you, weapons drawn! Combat begins! (${generateThreatLevel()})`
+            const enemy = random(DM_CONTENT.enemies);
+            const str = currentCharacter.abilities.Strength;
+            const dex = currentCharacter.abilities.Dexterity;
+
+            const initiativeRoll = rollDice(6).total + getAbilityModifier(dex);
+
+            const combatIntros = [
+                `${random([
+                    'Without warning',
+                    'From the shadows',
+                    'With a battle cry',
+                    'Suddenly',
+                    'In a blur of motion'
+                ])}, ${enemy.name} (${enemy.description}) ${enemy.tactics}!`,
+
+                `Your ${currentCharacter.class} training kicks in as you face ${enemy.name}. The ${enemy.description} creature ${enemy.tactics}. ${random([
+                    'You have moments to react',
+                    'There\'s no time to hesitate',
+                    'Your life depends on your next move',
+                    'This will test your skills'
+                ])}.`,
+
+                `Combat erupts! ${enemy.name} - ${enemy.description} - confronts you. ${random([
+                    'The creature appears wounded but dangerous',
+                    'It moves with predatory grace',
+                    'Madness gleams in its eyes',
+                    'It seems to be guarding something'
+                ])} and ${enemy.tactics}.`
             ];
-            return responses[Math.floor(Math.random() * responses.length)];
+
+            let response = random(combatIntros);
+
+            // Add tactical information based on class
+            if (currentCharacter.class.includes('Fighter') || currentCharacter.class.includes('Ranger')) {
+                response += `\n\n(Your combat experience reveals: Threat level is ${enemy.threat}. ${random([
+                    'Aim for weak points in its defense',
+                    'Keep your guard up and watch for openings',
+                    'Use your superior reach to your advantage',
+                    'Circle to its blind side'
+                ])})`;
+            }
+
+            // Add initiative result
+            response += `\n\nYou rolled ${initiativeRoll} for initiative (d6 + Dex modifier).`;
+
+            if (initiativeRoll >= 5) {
+                response += ` You strike first! ${random([
+                    'Describe your opening attack',
+                    'What\'s your tactic?',
+                    'How do you engage?',
+                    'Make your move count'
+                ])}!`;
+            } else {
+                response += ` Your opponent moves first - ${random([
+                    'you must react quickly',
+                    'brace yourself',
+                    'defend yourself',
+                    'prepare to counter'
+                ])}!`;
+            }
+
+            // Chance for environmental factors
+            if (Math.random() < 0.3) {
+                response += ` ${random([
+                    'The terrain here is treacherous - watch your footing',
+                    'Your back is against a wall - limited room to maneuver',
+                    'You spot cover nearby that you could use',
+                    'The lighting is poor - both of you are hindered'
+                ])}!`;
+            }
+
+            return response;
         }
 
-        function generateEnemy() {
-            const enemies = [
-                'a hulking orc warrior', 'a pack of goblin raiders', 'a skeletal guardian',
-                'a giant spider', 'a bandit ambush', 'a hobgoblin sergeant',
-                'a zombie shambling forward', 'a dire wolf', 'a kobold patrol'
-            ];
-            return enemies[Math.floor(Math.random() * enemies.length)];
-        }
+        function generateMovementResponse(action) {
+            const destinations = [...GREYHAWK_LOCATIONS, ...DM_CONTENT.locations.dungeon, ...DM_CONTENT.locations.wilderness];
+            const newLocation = random(destinations);
 
-        function generateThreatLevel() {
-            const levels = [
-                'It looks like a fair fight',
-                'This opponent appears formidable',
-                'You may be outmatched',
-                'Victory should be yours if you\'re careful',
-                'This will be a challenging encounter'
-            ];
-            return levels[Math.floor(Math.random() * levels.length)];
-        }
-
-        function generateMovementResponse() {
-            const newLocation = GREYHAWK_LOCATIONS[Math.floor(Math.random() * GREYHAWK_LOCATIONS.length)];
+            gameSession.context.discoveredLocations.push(newLocation);
             gameSession.location = newLocation;
 
-            return `You travel through the lands of Greyhawk. After some time, you arrive at ${newLocation}. ${generateLocationDescription()} What do you do?`;
-        }
+            const travelEvents = [
+                `As you journey toward ${newLocation}, ${random([
+                    'you encounter a traveling merchant who shares news of the road',
+                    'storm clouds gather ominously on the horizon',
+                    'you spot riders in the distance - they haven\'t seen you yet',
+                    'you find the remains of a recent campsite',
+                    'an old hermit warns you of dangers ahead'
+                ])}. `,
 
-        function generateLocationDescription() {
-            const descriptions = [
-                'The settlement bustles with activity as merchants and travelers go about their business.',
-                'An air of mystery hangs over this place, and you sense adventure awaits.',
-                'The locals eye you with a mixture of curiosity and suspicion.',
-                'This appears to be a relatively safe haven, at least for now.',
-                'You can feel the weight of history in this ancient place.'
+                `The path to ${newLocation} is ${random([
+                    'longer and more arduous than expected',
+                    'surprisingly peaceful and uneventful',
+                    'fraught with signs of recent conflict',
+                    'well-traveled and relatively safe',
+                    'overgrown and barely visible'
+                ])}. `,
+
+                `Your ${currentCharacter.race} heritage serves you well on the journey to ${newLocation}. ${random([
+                    'You avoid several potential dangers',
+                    'You make better time than most travelers',
+                    'You sense something following you',
+                    'You discover a shortcut through the wilderness'
+                ])}. `
             ];
-            return descriptions[Math.floor(Math.random() * descriptions.length)];
+
+            let response = random(travelEvents);
+
+            response += `You arrive at ${newLocation}. ${random([
+                `This ${random(['ancient', 'storied', 'mysterious', 'infamous', 'legendary'])} place is ${random([
+                    'exactly as the stories described',
+                    'more imposing than you imagined',
+                    'strangely quiet and deserted',
+                    'bustling with activity',
+                    'showing signs of recent trouble'
+                ])}.`,
+
+                `The ${random(['settlement', 'location', 'area', 'region'])} of ${newLocation} ${random([
+                    'has clearly seen better days',
+                    'seems prosperous and well-defended',
+                    'radiates an aura of ancient power',
+                    'appears to be in a state of alert',
+                    'welcomes travelers with open gates'
+                ])}.`,
+
+                `${newLocation} ${random([
+                    'stands before you like something from legend',
+                    'immediately sets your adventurer\'s instincts on edge',
+                    'looks like the perfect place for opportunity... and danger',
+                    'seems to hold secrets waiting to be uncovered'
+                ])}.`
+            ])}`;
+
+            // Random encounter chance
+            if (Math.random() < 0.25) {
+                response += `\n\nHowever, as you enter ${newLocation}, ${random([
+                    'guards stop you for questioning',
+                    'you witness a commotion in the street',
+                    'someone rushes up to you urgently',
+                    'you notice you\'re being followed',
+                    'an alarm suddenly rings out'
+                ])}.`;
+            }
+
+            return response;
         }
 
         function generateItemResponse() {
-            const items = [
-                'a rusty longsword', 'a leather pouch containing 2d6 gold pieces',
-                'a healing potion', 'a mysterious amulet', 'a worn map',
-                'a set of thieves\' tools', 'a spellbook', 'a silver dagger'
-            ];
-            const item = items[Math.floor(Math.random() * items.length)];
+            const item = random(DM_CONTENT.treasures);
+            const dex = currentCharacter.abilities.Dexterity;
 
-            return `You acquire ${item}. It has been added to your inventory. ${generateItemEffect()}`;
-        }
+            let response = `${random([
+                'Your keen eyes spot',
+                'You discover',
+                'Searching carefully, you find',
+                'Hidden among the debris is',
+                currentCharacter.class.includes('Thief') ? 'Your roguish instincts lead you to' : 'You come across'
+            ])} ${item}. `;
 
-        function generateItemEffect() {
-            const effects = [
-                'It may prove useful in your adventures.',
-                'You sense this item has a story to tell.',
-                'This could be valuable to the right buyer.',
-                'The craftsmanship is remarkable.',
-                'It radiates a faint magical aura.'
-            ];
-            return effects[Math.floor(Math.random() * effects.length)];
+            // Thieves get bonuses
+            if (currentCharacter.class.includes('Thief') && Math.random() < 0.3) {
+                response += `Your ${currentCharacter.class} training reveals ${random([
+                    'a hidden compartment with additional coins',
+                    'that this item is worth more than it appears',
+                    'a secret marking indicating its true value',
+                    'this belonged to someone important'
+                ])}! `;
+            }
+
+            response += random([
+                `You add it to your pack. ${random([
+                    'It may prove invaluable',
+                    'This could change everything',
+                    'Such finds are what make adventuring worthwhile',
+                    'The gods smile upon you this day'
+                ])}.`,
+
+                `${random([
+                    'The item radiates subtle magic',
+                    'This is clearly well-crafted',
+                    'You sense this has history',
+                    'Something about this feels significant'
+                ])}. You secure it carefully.`,
+
+                `${random([
+                    'A fortunate discovery',
+                    'Luck favors the bold',
+                    'Your persistence pays off',
+                    'Fate works in mysterious ways'
+                ])}. ${random([
+                    'You wonder what other treasures might be hidden nearby',
+                    'Perhaps there\'s more to find here',
+                    'This bodes well for your quest'
+                ])}.`
+            ]);
+
+            return response;
         }
 
         function generateSpellResponse() {
             if (!currentCharacter.class.includes('Magic-User') &&
                 !currentCharacter.class.includes('Cleric') &&
+                !currentCharacter.class.includes('Druid') &&
                 !currentCharacter.class.includes('Illusionist')) {
-                return `As a ${currentCharacter.class}, you have no spellcasting abilities. Perhaps you should rely on your other skills.`;
+                return `As a ${currentCharacter.class}, you lack the arcane training for spellcasting. ${random([
+                    'Perhaps a scroll or magical item could help',
+                    'Your skills lie in other areas',
+                    'Magic is not your forte - but that doesn\'t make you any less capable',
+                    'Leave the magic to wizards; you have your own strengths'
+                ])}.`;
             }
 
-            return `Your incantation echoes through the air! ${generateMagicEffect()} The spell takes effect with ${rollDice(100).total < 50 ? 'perfect precision' : 'minor fluctuations in the weave'}.`;
-        }
+            const int = currentCharacter.abilities.Intelligence;
+            const wis = currentCharacter.abilities.Wisdom;
+            const relevantStat = currentCharacter.class.includes('Cleric') || currentCharacter.class.includes('Druid') ? wis : int;
 
-        function generateMagicEffect() {
             const effects = [
-                'Arcane energy crackles from your fingertips.',
-                'The air shimmers with mystical power.',
-                'Reality bends to your will.',
-                'Ancient words of power flow from your lips.',
-                'The fabric of magic responds to your command.'
+                `Your ${currentCharacter.class} powers surge through you! ${random([
+                    'Eldritch energy crackles and hisses',
+                    'The air itself warps and shimmers',
+                    'Ancient words of power echo with terrible force',
+                    'Reality bends to your trained will',
+                    'The weave of magic responds eagerly to your command'
+                ])}. `,
+
+                `Drawing upon your ${relevantStat > 15 ? 'considerable' : 'trained'} magical abilities (${currentCharacter.class.includes('Cleric') ? 'Wisdom' : 'Intelligence'} ${relevantStat}), you ${random([
+                    'weave the spell with practiced precision',
+                    'channel raw magical force',
+                    'invoke powers beyond mortal ken',
+                    'tap into the fundamental forces of creation'
+                ])}. `,
+
+                `The spell ${random([
+                    'manifests exactly as intended',
+                    'surges forth with unexpected potency',
+                    'takes shape with beautiful precision',
+                    'erupts in a display of mystical power'
+                ])}! ${random([
+                    'Your magical training serves you well',
+                    'The power of the arcane flows through you',
+                    'Such is the might of a true spellcaster',
+                    'This is why you studied the mystical arts'
+                ])}. `
             ];
-            return effects[Math.floor(Math.random() * effects.length)];
+
+            let response = random(effects);
+
+            // High Int/Wis characters get extra effect
+            if (relevantStat > 16) {
+                response += `(Your exceptional ${currentCharacter.class.includes('Cleric') ? 'Wisdom' : 'Intelligence'} allows for ${random([
+                    'enhanced spell duration',
+                    'increased potency',
+                    'better control and precision',
+                    'additional magical effects'
+                ])})`;
+            }
+
+            return response;
         }
 
-        function generateGeneralResponse() {
+        function generateRestResponse() {
+            const con = currentCharacter.abilities.Constitution;
+            const conMod = getAbilityModifier(con);
+            const healAmount = Math.max(1, rollDice(4).total + conMod);
+
+            return `You ${random([
+                'find a relatively safe spot to rest',
+                'make camp and tend to your wounds',
+                'take a moment to catch your breath and recover',
+                'settle in for some much-needed rest'
+            ])}. ${random([
+                'The respite does you good',
+                'Your body begins to mend',
+                'You feel your strength returning',
+                'Rest revitalizes you'
+            ])}. You recover ${healAmount} HP (d4 + Con modifier). ${random([
+                'You remain vigilant even as you rest',
+                'The night passes without incident',
+                'You wake feeling refreshed',
+                'Your wounds begin to heal'
+            ])}.`;
+        }
+
+        function generateStealthResponse() {
+            const dex = currentCharacter.abilities.Dexterity;
+            const stealthRoll = rollDice(20).total + getAbilityModifier(dex);
+
+            let response = `You attempt to ${random([
+                'move silently through the shadows',
+                'blend into your surroundings',
+                'avoid detection',
+                'sneak past unnoticed'
+            ])}. `;
+
+            if (currentCharacter.class.includes('Thief') || currentCharacter.class.includes('Assassin')) {
+                response += `Your ${currentCharacter.class} training gives you an advantage. `;
+            }
+
+            response += `(Stealth check: ${stealthRoll} = d20 + Dex modifier)`;
+
+            if (stealthRoll >= 15) {
+                response += ` You succeed brilliantly! ${random([
+                    'You move like a ghost',
+                    'Not even the most alert guard would spot you',
+                    'You are one with the shadows',
+                    'Your movements are practically invisible'
+                ])}.`;
+            } else if (stealthRoll >= 10) {
+                response += ` You manage reasonable stealth, but ${random([
+                    'you must still be cautious',
+                    'one wrong move could give you away',
+                    'you\'re not entirely undetectable',
+                    'careful observation might reveal you'
+                ])}.`;
+            } else {
+                response += ` Unfortunately, ${random([
+                    'you make more noise than intended',
+                    'your movements attract attention',
+                    'you\'re not as subtle as you hoped',
+                    'someone may have noticed you'
+                ])}.`;
+            }
+
+            return response;
+        }
+
+        function generateListeningResponse(environment) {
+            const wis = currentCharacter.abilities.Wisdom;
+            const listenRoll = rollDice(20).total + getAbilityModifier(wis);
+
+            let response = `You pause and listen carefully... (Perception: ${listenRoll} = d20 + Wis modifier)\n\n`;
+
+            if (listenRoll >= 15) {
+                response += `Your keen hearing picks up ${random([
+                    'hushed voices discussing something in another room',
+                    'the scrape of metal on stone - something moving nearby',
+                    'water flowing somewhere below you',
+                    'the distinctive sound of coins being counted',
+                    'breathing - someone or something is very close',
+                    'footsteps approaching from the east',
+                    'chanting in a language you don\'t recognize'
+                ])}. ${random([
+                    'This information could prove valuable',
+                    'You\'ve learned something important',
+                    'Your vigilance has paid off',
+                    'This changes things'
+                ])}.`;
+            } else if (listenRoll >= 10) {
+                response += `You hear ${random([
+                    'vague sounds that are hard to identify',
+                    'the usual ambient noises of ' + environment,
+                    'something, but you can\'t quite make it out',
+                    'distant sounds that might or might not be significant'
+                ])}. ${random([
+                    'Nothing seems immediately threatening',
+                    'Perhaps if you listened more carefully',
+                    'The acoustics here make it difficult to discern details'
+                ])}.`;
+            } else {
+                response += `${random([
+                    'The sounds are confusing and indistinct',
+                    'You strain to hear but catch nothing useful',
+                    'The ambient noise makes it hard to focus',
+                    'Your ears pick up nothing of note'
+                ])}. ${random([
+                    'Perhaps silence isn\'t always golden',
+                    'Sometimes discretion is the better part of valor',
+                    'You\'ll have to rely on other senses'
+                ])}.`;
+            }
+
+            return response;
+        }
+
+        function generateHelpResponse() {
+            const cha = currentCharacter.abilities.Charisma;
+
+            return `You ${random([
+                'rush to offer assistance',
+                'step forward to help',
+                'lend your aid to those in need',
+                'answer the call for help'
+            ])}. ${random([
+                `Your ${currentCharacter.alignment} nature compels you to act`,
+                `As a ${currentCharacter.class}, you're no stranger to helping others`,
+                `This is what heroes do`,
+                `You couldn't stand by and do nothing`
+            ])}. ${random([
+                'Your assistance is appreciated and remembered',
+                'Good deeds have a way of coming back around',
+                'You\'ve made an ally this day',
+                'Sometimes being a hero means simply helping those in need'
+            ])}. ${cha > 14 ? `(Your Charisma of ${cha} makes your aid even more effective and appreciated)` : ''}`;
+        }
+
+        function generateGeneralResponse(action) {
             const responses = [
-                `You proceed with your action. ${generateOutcome()} ${generateFollowUp()}`,
-                `Interesting choice! ${generateOutcome()} ${generateFollowUp()}`,
-                `As a ${currentCharacter.class}, you attempt this with confidence. ${generateOutcome()} ${generateFollowUp()}`
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
+                `You attempt your action. ${random([
+                    'Your ' + currentCharacter.class + ' instincts guide you',
+                    'Drawing on your experience, you proceed carefully',
+                    'This requires focus and determination',
+                    'You commit fully to this course of action'
+                ])}. ${random([
+                    'The outcome will reveal itself shortly',
+                    'Only time will tell if this was wise',
+                    'Your actions will have consequences',
+                    'What happens next could change everything'
+                ])}.`,
 
-        function generateOutcome() {
-            const outcomes = [
-                'Your action yields unexpected results.',
-                'Things proceed as you hoped.',
-                'The situation takes an interesting turn.',
-                'Your experience serves you well.',
-                'This proves more challenging than anticipated.'
-            ];
-            return outcomes[Math.floor(Math.random() * outcomes.length)];
-        }
+                `As a ${currentCharacter.race} ${currentCharacter.class}, you ${random([
+                    'approach this challenge with confidence',
+                    'draw upon your unique perspective',
+                    'use your training to guide your actions',
+                    'trust your instincts'
+                ])}. ${random([
+                    'The situation develops in unexpected ways',
+                    'Things proceed, though not entirely as planned',
+                    'Your action sets events in motion',
+                    'The consequences of your choice become apparent'
+                ])}.`,
 
-        function generateFollowUp() {
-            const followUps = [
-                'What is your next move?',
-                'How do you respond?',
-                'What do you do now?',
-                'The choice is yours, adventurer.',
-                'Your adventure continues...'
+                `You proceed with determination. ${random([
+                    'The path of adventure is never straightforward',
+                    'Every choice shapes your legend',
+                    'This is the life you chose',
+                    'Such is the way of heroes'
+                ])}. ${random([
+                    'What will you do next?',
+                    'The story continues',
+                    'Your journey is far from over',
+                    'More challenges await'
+                ])}.`
             ];
-            return followUps[Math.floor(Math.random() * followUps.length)];
+
+            return random(responses);
         }
 
         function endSession() {
