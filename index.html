@@ -1370,13 +1370,28 @@
             showLogin();
         }
 
-        function login() {
+        async function login() {
             const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
 
             if (!username || !password) {
                 alert('Please fill in all fields');
                 return;
+            }
+
+            // Try to load from cloud first (if configured)
+            const cloudSyncEnabled = loadFromStorage('adminCloudSyncEnabled');
+            const githubToken = loadFromStorage('adminGithubToken');
+            const gistId = loadFromStorage('adminGistId');
+
+            if (cloudSyncEnabled && githubToken && gistId) {
+                try {
+                    console.log('[Login] Loading latest data from cloud...');
+                    await adminLoadFromCloudSilent();
+                } catch (error) {
+                    console.warn('[Login] Could not load from cloud:', error);
+                    // Continue with local data
+                }
             }
 
             const users = loadFromStorage('users') || {};
@@ -1389,9 +1404,7 @@
             currentUser = username;
             saveToStorage('currentUser', username);
 
-            // Auto-sync on login to get latest cloud data
-            autoSyncIfEnabled();
-
+            console.log('[Login] Successful! User:', username);
             showMainMenu();
         }
 
@@ -1415,6 +1428,12 @@
             AI_CONFIG.useAI = settings.useAI || false;
             AI_CONFIG.apiKey = getEffectiveApiKey(); // Use global or user key
             AI_CONFIG.model = settings.aiModel || 'claude-3-5-sonnet-20241022';
+
+            console.log('[Settings] AI Config loaded:', {
+                useAI: AI_CONFIG.useAI,
+                hasApiKey: !!AI_CONFIG.apiKey,
+                model: AI_CONFIG.model
+            });
 
             showScreen('mainMenuScreen');
         }
@@ -1852,6 +1871,8 @@ INSTRUCTIONS:
 - Include consequences and choices`;
 
             try {
+                console.log('[AI] Calling Claude API with model:', AI_CONFIG.model);
+
                 const response = await fetch(AI_CONFIG.apiEndpoint, {
                     method: 'POST',
                     headers: {
@@ -1871,14 +1892,17 @@ INSTRUCTIONS:
                 });
 
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[AI] API Error:', response.status, errorText);
                     throw new Error(`API Error: ${response.status}`);
                 }
 
                 const data = await response.json();
+                console.log('[AI] ✓ Successfully generated AI response');
                 return { text: data.content[0].text, isAI: true };
 
             } catch (error) {
-                console.error('AI API Error:', error);
+                console.error('[AI] ✗ AI generation failed, falling back to procedural:', error.message);
                 // Fallback to procedural generation
                 const proceduralResponse = generateDMResponseProcedural(playerAction);
                 return { text: proceduralResponse, isAI: false };
@@ -1888,10 +1912,19 @@ INSTRUCTIONS:
         async function generateDMResponse(playerAction) {
             // Use AI or procedural generation based on config
             const effectiveApiKey = getEffectiveApiKey();
+
+            console.log('[AI] Config check:', {
+                useAI: AI_CONFIG.useAI,
+                hasApiKey: !!effectiveApiKey,
+                apiKeyPreview: effectiveApiKey ? effectiveApiKey.substring(0, 10) + '...' : 'none'
+            });
+
             if (AI_CONFIG.useAI && effectiveApiKey) {
                 AI_CONFIG.apiKey = effectiveApiKey; // Set for current call
+                console.log('[AI] Using AI for DM response');
                 return await generateDMResponseWithAI(playerAction);
             } else {
+                console.log('[AI] Using procedural generation - AI disabled or no API key');
                 const proceduralResponse = generateDMResponseProcedural(playerAction);
                 return { text: proceduralResponse, isAI: false };
             }
@@ -2843,6 +2876,36 @@ INSTRUCTIONS:
                 console.error('Cloud load error:', error);
                 alert(`Failed to load from cloud:\n\n${error.message}\n\nCheck console for details.`);
             }
+        }
+
+        // Silent version for automatic loading on login
+        async function adminLoadFromCloudSilent() {
+            const token = loadFromStorage('adminGithubToken');
+            const gistId = loadFromStorage('adminGistId');
+
+            if (!token || !gistId) {
+                return; // Silently skip if not configured
+            }
+
+            const response = await fetch(`https://api.github.com/gists/${gistId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`GitHub API Error ${response.status}`);
+            }
+
+            const gist = await response.json();
+            const content = gist.files['solo-dm-save.json'].content;
+            const cloudData = JSON.parse(content);
+
+            // Replace local data with cloud data
+            saveToStorage('users', cloudData);
+            console.log('[Cloud Sync] Data loaded from cloud successfully');
         }
 
         function exportData() {
