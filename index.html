@@ -777,9 +777,9 @@
                     </select>
                 </div>
 
-                <details style="margin-top: 1rem;">
-                    <summary style="cursor: pointer; color: var(--text-gold); font-weight: 600;">🔑 Admin: Configure Global API Key</summary>
-                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 6px;">
+                <details style="margin-top: 1rem;" id="adminSection">
+                    <summary style="cursor: pointer; color: var(--text-gold); font-weight: 600;" onclick="checkAdminAccess(event)">🔑 Admin: Configure Global API Key</summary>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 6px;" id="adminContent">
                         <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
                             Admins can set a global API key that ALL users can use. This allows everyone to enjoy AI responses without needing their own key.
                         </p>
@@ -794,6 +794,8 @@
                         <p style="color: var(--accent); font-size: 0.85rem; margin-top: 1rem;">
                             ⚠️ This key will be used by all users. API costs will be charged to this account.
                         </p>
+                        <hr style="margin: 1.5rem 0; border-color: var(--border);">
+                        <button class="btn btn-secondary" onclick="changeAdminPassword()">Change Admin Password</button>
                     </div>
                 </details>
             </div>
@@ -2275,6 +2277,79 @@ INSTRUCTIONS:
                 alert(useAI && effectiveKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
                 showMainMenu();
             }
+        }
+
+        function checkAdminAccess(event) {
+            event.preventDefault();
+
+            const adminPassword = loadFromStorage('adminPassword');
+            const details = document.getElementById('adminSection');
+
+            // If already open, allow it to close
+            if (details.hasAttribute('open')) {
+                return true;
+            }
+
+            // First time setup - no password set yet
+            if (!adminPassword) {
+                const newPassword = prompt('Set up admin password (this is your first time):');
+                if (!newPassword) {
+                    return false;
+                }
+                const confirmPassword = prompt('Confirm admin password:');
+                if (newPassword !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return false;
+                }
+                if (newPassword.length < 4) {
+                    alert('Password must be at least 4 characters');
+                    return false;
+                }
+                saveToStorage('adminPassword', newPassword);
+                alert('Admin password set! You can now access admin settings.');
+                details.setAttribute('open', '');
+                return false;
+            }
+
+            // Verify password
+            const inputPassword = prompt('Enter admin password:');
+            if (inputPassword !== adminPassword) {
+                alert('Incorrect admin password!');
+                return false;
+            }
+
+            // Allow opening
+            details.setAttribute('open', '');
+            return false;
+        }
+
+        function changeAdminPassword() {
+            const currentPassword = loadFromStorage('adminPassword');
+            if (!currentPassword) {
+                alert('No admin password is set');
+                return;
+            }
+
+            const inputCurrent = prompt('Enter current admin password:');
+            if (inputCurrent !== currentPassword) {
+                alert('Incorrect current password!');
+                return;
+            }
+
+            const newPassword = prompt('Enter new admin password:');
+            if (!newPassword || newPassword.length < 4) {
+                alert('Password must be at least 4 characters');
+                return;
+            }
+
+            const confirmPassword = prompt('Confirm new admin password:');
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            saveToStorage('adminPassword', newPassword);
+            alert('Admin password updated successfully!');
         }
 
         function saveAdminApiKey() {
