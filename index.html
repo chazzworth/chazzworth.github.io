@@ -2454,8 +2454,9 @@ INSTRUCTIONS:
                     response = await fetch(`https://api.github.com/gists/${settings.gistId}`, {
                         method: 'PATCH',
                         headers: {
-                            'Authorization': `token ${settings.githubToken}`,
-                            'Accept': 'application/vnd.github.v3+json'
+                            'Authorization': `Bearer ${settings.githubToken}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
                         },
                         body: JSON.stringify(gistData)
                     });
@@ -2464,15 +2465,18 @@ INSTRUCTIONS:
                     response = await fetch('https://api.github.com/gists', {
                         method: 'POST',
                         headers: {
-                            'Authorization': `token ${settings.githubToken}`,
-                            'Accept': 'application/vnd.github.v3+json'
+                            'Authorization': `Bearer ${settings.githubToken}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
                         },
                         body: JSON.stringify(gistData)
                     });
                 }
 
                 if (!response.ok) {
-                    throw new Error(`GitHub API Error: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('GitHub API Error:', response.status, errorData);
+                    throw new Error(`GitHub API Error ${response.status}: ${errorData.message || 'Unknown error'}`);
                 }
 
                 const gist = await response.json();
@@ -2490,7 +2494,7 @@ INSTRUCTIONS:
                 }
             } catch (error) {
                 console.error('Cloud sync error:', error);
-                alert('Failed to sync to cloud. Please check your GitHub token.');
+                alert(`Failed to sync to cloud:\n\n${error.message}\n\nCheck console for details.`);
             }
         }
 
@@ -2512,13 +2516,16 @@ INSTRUCTIONS:
             try {
                 const response = await fetch(`https://api.github.com/gists/${gistId}`, {
                     headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json'
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'X-GitHub-Api-Version': '2022-11-28'
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error(`GitHub API Error: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('GitHub API Error:', response.status, errorData);
+                    throw new Error(`GitHub API Error ${response.status}: ${errorData.message || 'Unknown error'}`);
                 }
 
                 const gist = await response.json();
@@ -2537,7 +2544,7 @@ INSTRUCTIONS:
                 }
             } catch (error) {
                 console.error('Cloud load error:', error);
-                alert('Failed to load from cloud. Please check your GitHub token and Gist ID.');
+                alert(`Failed to load from cloud:\n\n${error.message}\n\nCheck console for details.`);
             }
         }
 
