@@ -699,6 +699,41 @@
                 </div>
             </div>
 
+            <div class="card">
+                <h2 class="card-title">🤖 AI Dungeon Master (Advanced)</h2>
+                <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Enable Claude AI for truly dynamic, contextual DM responses instead of procedural generation.
+                </p>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="useAI" style="width: auto; margin: 0;">
+                        Use Claude AI API
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Anthropic API Key</label>
+                    <input type="password" id="apiKey" placeholder="sk-ant-api03-...">
+                    <p style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.5rem;">
+                        Get your API key from <a href="https://console.anthropic.com/" target="_blank" style="color: var(--text-gold);">console.anthropic.com</a>
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label>AI Model</label>
+                    <select id="aiModel">
+                        <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet (Recommended)</option>
+                        <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku (Faster, Cheaper)</option>
+                        <option value="claude-3-opus-20240229">Claude 3 Opus (Most Creative)</option>
+                    </select>
+                </div>
+
+                <p style="color: var(--warning); font-size: 0.85rem; margin-top: 1rem;">
+                    ⚠️ Using the AI API will incur costs on your Anthropic account. Typical cost: $0.01-0.03 per game session.
+                </p>
+            </div>
+
             <div class="flex flex-gap flex-center">
                 <button class="btn btn-success" onclick="saveSettings()">Save Settings</button>
                 <button class="btn btn-secondary" onclick="showMainMenu()">Back to Menu</button>
@@ -987,6 +1022,14 @@
 
         function showMainMenu() {
             document.getElementById('welcomeUser').textContent = currentUser;
+
+            // Load AI settings for current user
+            const users = loadFromStorage('users');
+            const settings = users[currentUser].settings;
+            AI_CONFIG.useAI = settings.useAI || false;
+            AI_CONFIG.apiKey = settings.apiKey || '';
+            AI_CONFIG.model = settings.aiModel || 'claude-3-5-sonnet-20241022';
+
             showScreen('mainMenuScreen');
         }
 
@@ -1280,7 +1323,7 @@
             renderNarrative();
         }
 
-        function submitAction() {
+        async function submitAction() {
             const actionInput = document.getElementById('playerAction');
             const action = actionInput.value.trim();
 
@@ -1293,10 +1336,29 @@
             addNarrative(action, 'player');
             actionInput.value = '';
 
-            // Generate DM response
-            setTimeout(() => {
-                const response = generateDMResponse(action);
-                addNarrative(response, 'dm');
+            // Show thinking indicator
+            addNarrative('The DM is considering your action...', 'system');
+
+            // Generate DM response (handles both AI and procedural)
+            setTimeout(async () => {
+                try {
+                    const response = await generateDMResponse(action);
+
+                    // Remove thinking indicator
+                    gameSession.narrative = gameSession.narrative.filter(n =>
+                        !n.text.includes('DM is considering')
+                    );
+
+                    addNarrative(response, 'dm');
+                } catch (error) {
+                    console.error('Error generating response:', error);
+                    gameSession.narrative = gameSession.narrative.filter(n =>
+                        !n.text.includes('DM is considering')
+                    );
+                    addNarrative('An error occurred. The DM will use traditional methods.', 'system');
+                    const fallbackResponse = generateDMResponseProcedural(action);
+                    addNarrative(fallbackResponse, 'dm');
+                }
             }, 1000);
         }
 
@@ -1340,7 +1402,90 @@
             return 'wilderness';
         }
 
+        // AI API Configuration
+        const AI_CONFIG = {
+            useAI: false, // Set to true to use AI API instead of procedural generation
+            apiKey: '', // Add your Anthropic API key here
+            model: 'claude-3-5-sonnet-20241022',
+            apiEndpoint: 'https://api.anthropic.com/v1/messages'
+        };
+
+        async function generateDMResponseWithAI(playerAction) {
+            const users = loadFromStorage('users');
+            const settings = users[currentUser].settings;
+
+            // Build context for the AI
+            const recentNarrative = gameSession.narrative.slice(-5).map(n =>
+                `${n.type === 'player' ? 'Player' : 'DM'}: ${n.text}`
+            ).join('\n');
+
+            const systemPrompt = `You are an expert Dungeon Master for AD&D 1st Edition, running a solo adventure in the World of Greyhawk.
+
+GAME STATE:
+- Character: ${currentCharacter.name}, Level ${currentCharacter.level} ${currentCharacter.race} ${currentCharacter.class}
+- Alignment: ${currentCharacter.alignment}
+- Location: ${gameSession.location}
+- Stats: STR ${currentCharacter.abilities.Strength}, INT ${currentCharacter.abilities.Intelligence}, WIS ${currentCharacter.abilities.Wisdom}, DEX ${currentCharacter.abilities.Dexterity}, CON ${currentCharacter.abilities.Constitution}, CHA ${currentCharacter.abilities.Charisma}
+- HP: ${currentCharacter.hp}/${currentCharacter.maxHp}
+- DM Style: ${settings.dmStyle}
+- Difficulty: ${settings.difficulty}
+
+RECENT NARRATIVE:
+${recentNarrative}
+
+INSTRUCTIONS:
+- Respond to the player's action with vivid, immersive narration
+- Use the character's stats to influence outcomes (high WIS notices more, high CHA influences NPCs, etc.)
+- Follow AD&D 1st Edition rules
+- Include dice rolls when appropriate (format: "Roll 1d20 + modifier")
+- Create memorable NPCs with personalities
+- Build on previous narrative events
+- Keep responses concise but descriptive (2-4 paragraphs)
+- Include consequences and choices`;
+
+            try {
+                const response = await fetch(AI_CONFIG.apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': AI_CONFIG.apiKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: AI_CONFIG.model,
+                        max_tokens: 1024,
+                        system: systemPrompt,
+                        messages: [{
+                            role: 'user',
+                            content: `Player action: ${playerAction}\n\nRespond as the Dungeon Master.`
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.content[0].text;
+
+            } catch (error) {
+                console.error('AI API Error:', error);
+                // Fallback to procedural generation
+                return generateDMResponseProcedural(playerAction);
+            }
+        }
+
         function generateDMResponse(playerAction) {
+            // Use AI or procedural generation based on config
+            if (AI_CONFIG.useAI && AI_CONFIG.apiKey) {
+                return generateDMResponseWithAI(playerAction);
+            } else {
+                return generateDMResponseProcedural(playerAction);
+            }
+        }
+
+        function generateDMResponseProcedural(playerAction) {
             const users = loadFromStorage('users');
             const settings = users[currentUser].settings;
             const action = playerAction.toLowerCase();
@@ -1992,18 +2137,35 @@
             document.getElementById('difficulty').value = settings.difficulty;
             document.getElementById('setting').value = settings.setting;
 
+            // Load AI settings
+            document.getElementById('useAI').checked = settings.useAI || false;
+            document.getElementById('apiKey').value = settings.apiKey || '';
+            document.getElementById('aiModel').value = settings.aiModel || 'claude-3-5-sonnet-20241022';
+
             showScreen('settingsScreen');
         }
 
         function saveSettings() {
             const users = loadFromStorage('users');
+            const useAI = document.getElementById('useAI').checked;
+            const apiKey = document.getElementById('apiKey').value.trim();
+
             users[currentUser].settings = {
                 dmStyle: document.getElementById('dmStyle').value,
                 difficulty: document.getElementById('difficulty').value,
-                setting: document.getElementById('setting').value
+                setting: document.getElementById('setting').value,
+                useAI: useAI,
+                apiKey: apiKey,
+                aiModel: document.getElementById('aiModel').value
             };
+
+            // Update global AI config
+            AI_CONFIG.useAI = useAI;
+            AI_CONFIG.apiKey = apiKey;
+            AI_CONFIG.model = document.getElementById('aiModel').value;
+
             saveToStorage('users', users);
-            alert('Settings saved!');
+            alert(useAI && apiKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
             showMainMenu();
         }
 
