@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habit Tracker</title>
+    <title>Solo Dungeon Master - AD&D 1st Edition</title>
     <style>
         * {
             margin: 0;
@@ -12,739 +12,1478 @@
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --primary: #8b4513;
+            --primary-dark: #654321;
+            --secondary: #daa520;
+            --accent: #dc143c;
+            --bg-dark: #1a1410;
+            --bg-medium: #2d2419;
+            --bg-light: #3d342a;
+            --text-light: #f5e6d3;
+            --text-gold: #ffd700;
+            --border: #6b5a47;
+            --success: #228b22;
+            --danger: #dc143c;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 10px rgba(218, 165, 32, 0.5);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
             line-height: 1.6;
+            min-height: 100vh;
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%231a1410"/><path d="M0 0 L100 100 M100 0 L0 100" stroke="%232d2419" stroke-width="0.5" opacity="0.1"/></svg>');
+            background-size: cover, 100px 100px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1rem;
         }
 
+        /* Header Styles */
         header {
-            background: var(--bg-secondary);
+            text-align: center;
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            border: 2px solid var(--border);
+            border-radius: 8px;
             margin-bottom: 2rem;
+            box-shadow: var(--shadow);
         }
 
         h1 {
-            color: var(--primary);
-            font-size: 2rem;
+            font-size: 2.5rem;
+            color: var(--text-gold);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             margin-bottom: 0.5rem;
+            font-family: 'Georgia', serif;
+            letter-spacing: 2px;
         }
 
         .subtitle {
-            color: var(--text-secondary);
+            color: var(--secondary);
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-light);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
             font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+        .btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            box-shadow: var(--glow);
+            transform: translateY(-2px);
         }
 
-        .stat-card {
-            background: var(--bg-secondary);
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--bg-light), var(--bg-medium));
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #a00);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #1a6b1a);
+        }
+
+        /* Card Styles */
+        .card {
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            border: 2px solid var(--border);
+            border-radius: 8px;
             padding: 1.5rem;
-            border-radius: 12px;
+            margin-bottom: 1.5rem;
             box-shadow: var(--shadow);
         }
 
-        .stat-card h3 {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--text-gold);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-light);
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: var(--glow);
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Login Screen */
+        .login-container {
+            max-width: 500px;
+            margin: 100px auto;
+        }
+
+        /* Main Menu */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .menu-card {
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow);
+            border-color: var(--secondary);
+        }
+
+        .menu-card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .menu-card-title {
+            font-size: 1.3rem;
+            color: var(--text-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-card-desc {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Character Creation */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: var(--secondary);
+            font-size: 0.9rem;
             margin-bottom: 0.5rem;
         }
 
         .stat-value {
             font-size: 2rem;
+            color: var(--text-gold);
             font-weight: bold;
-            color: var(--primary);
         }
 
-        .section {
-            background: var(--bg-secondary);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
+        .stat-modifier {
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
 
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .habit-form {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .habit-input {
-            flex: 1;
-            padding: 0.75rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .habit-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-small {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .habits-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .habit-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--bg-primary);
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.875rem;
-        }
-
-        .habit-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .remove-habit {
-            background: none;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 1.125rem;
-            padding: 0;
-            margin-left: 0.25rem;
-        }
-
-        .calendar-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .current-week {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .calendar-grid {
-            overflow-x: auto;
-        }
-
-        .calendar-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-        }
-
-        .calendar-table th {
-            background: var(--bg-primary);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .calendar-table th:first-child {
-            border-radius: 8px 0 0 0;
-        }
-
-        .calendar-table th:last-child {
-            border-radius: 0 8px 0 0;
-        }
-
-        .calendar-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .date-header {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .date-number {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .habit-name {
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .checkbox-cell {
-            text-align: center;
-        }
-
-        .habit-checkbox {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            accent-color: var(--success);
-        }
-
-        .today {
-            background: #fef3c7;
-        }
-
-        .notes-section {
+        /* Game Session */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
             margin-top: 1.5rem;
         }
 
-        .notes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .note-card {
-            background: var(--bg-primary);
-            padding: 1rem;
+        .character-panel {
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            border: 2px solid var(--border);
             border-radius: 8px;
-            border: 1px solid var(--border);
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 1rem;
         }
 
-        .note-date {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        .note-input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 60px;
+        .narrative-box {
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
-        .note-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: var(--border);
+        .narrative-entry {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-medium);
+            border-left: 4px solid var(--secondary);
             border-radius: 4px;
-            overflow: hidden;
-            margin-top: 0.5rem;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success), var(--primary));
-            transition: width 0.3s ease;
+        .narrative-dm {
+            border-left-color: var(--secondary);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: var(--text-secondary);
+        .narrative-player {
+            border-left-color: var(--primary);
+            background: var(--bg-light);
         }
 
-        .empty-state-icon {
-            font-size: 3rem;
+        .narrative-system {
+            border-left-color: var(--accent);
+            font-style: italic;
+        }
+
+        .action-bar {
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
             margin-bottom: 1rem;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
+        .dice-roller {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
 
-            .dashboard {
+        .dice-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            color: var(--text-light);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dice-btn:hover {
+            border-color: var(--secondary);
+            box-shadow: var(--glow);
+        }
+
+        /* Character List */
+        .character-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .character-card {
+            background: linear-gradient(135deg, var(--bg-medium), var(--bg-light));
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow);
+        }
+
+        .character-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .character-name {
+            font-size: 1.3rem;
+            color: var(--text-gold);
+        }
+
+        .character-level {
+            color: var(--secondary);
+        }
+
+        .character-class-race {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 1rem; }
+        .mb-2 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+        .flex { display: flex; }
+        .flex-gap { gap: 1rem; }
+        .flex-between { justify-content: space-between; }
+        .flex-center { justify-content: center; align-items: center; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-layout {
                 grid-template-columns: 1fr;
             }
 
-            .calendar-controls {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
+            .character-panel {
+                position: static;
             }
 
-            .habit-form {
-                flex-direction: column;
+            h1 {
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Habit Tracker</h1>
-            <p class="subtitle">Build better habits, one day at a time</p>
-        </header>
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <header>
+                <h1>⚔️ Solo Dungeon Master ⚔️</h1>
+                <p class="subtitle">Advanced Dungeons & Dragons 1st Edition</p>
+            </header>
 
-        <div class="dashboard" id="dashboard">
-            <div class="stat-card">
-                <h3>Total Habits</h3>
-                <div class="stat-value" id="totalHabits">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>This Week</h3>
-                <div class="stat-value" id="weekCompletion">0%</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="weekProgress" style="width: 0%"></div>
+            <div class="login-container">
+                <div class="card">
+                    <h2 class="card-title">Enter the Realm</h2>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                    <div class="flex flex-gap">
+                        <button class="btn" onclick="login()">Login</button>
+                        <button class="btn btn-secondary" onclick="showRegister()">Register</button>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <h3>Current Streak</h3>
-                <div class="stat-value" id="currentStreak">0 days</div>
-            </div>
-            <div class="stat-card">
-                <h3>Best Streak</h3>
-                <div class="stat-value" id="bestStreak">0 days</div>
-            </div>
         </div>
 
-        <div class="section">
-            <h2 class="section-title">Manage Habits</h2>
-            <div class="habit-form">
-                <input
-                    type="text"
-                    class="habit-input"
-                    id="habitInput"
-                    placeholder="Enter a new habit (e.g., Exercise, Read, Meditate)"
-                    maxlength="50"
-                />
-                <button class="btn" onclick="addHabit()">Add Habit</button>
-            </div>
-            <div class="habits-list" id="habitsList"></div>
-        </div>
+        <!-- Register Screen -->
+        <div id="registerScreen" class="screen">
+            <header>
+                <h1>⚔️ Solo Dungeon Master ⚔️</h1>
+                <p class="subtitle">Create Your Account</p>
+            </header>
 
-        <div class="section">
-            <div class="calendar-controls">
-                <h2 class="section-title" style="margin: 0">Weekly Tracker</h2>
-                <div class="calendar-nav">
-                    <button class="btn btn-small" onclick="previousWeek()">← Previous</button>
-                    <span class="current-week" id="currentWeek"></span>
-                    <button class="btn btn-small" onclick="nextWeek()">Next →</button>
+            <div class="login-container">
+                <div class="card">
+                    <h2 class="card-title">Register New Adventurer</h2>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="registerUsername" placeholder="Choose a username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" placeholder="Choose a password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="registerPasswordConfirm" placeholder="Confirm your password">
+                    </div>
+                    <div class="flex flex-gap">
+                        <button class="btn" onclick="register()">Register</button>
+                        <button class="btn btn-secondary" onclick="showLogin()">Back to Login</button>
+                    </div>
                 </div>
             </div>
-            <div class="calendar-grid">
-                <table class="calendar-table" id="calendarTable">
-                    <thead>
-                        <tr id="calendarHeader"></tr>
-                    </thead>
-                    <tbody id="calendarBody"></tbody>
-                </table>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div id="mainMenuScreen" class="screen">
+            <header>
+                <h1>⚔️ Solo Dungeon Master ⚔️</h1>
+                <p class="subtitle">Welcome, <span id="welcomeUser"></span>!</p>
+            </header>
+
+            <div class="menu-grid">
+                <div class="menu-card" onclick="showCharacterSelect()">
+                    <div class="menu-card-icon">🎭</div>
+                    <div class="menu-card-title">Play Adventure</div>
+                    <div class="menu-card-desc">Continue your epic journey</div>
+                </div>
+
+                <div class="menu-card" onclick="showCharacterCreation()">
+                    <div class="menu-card-icon">✨</div>
+                    <div class="menu-card-title">Create Character</div>
+                    <div class="menu-card-desc">Roll a new hero</div>
+                </div>
+
+                <div class="menu-card" onclick="showCharacterManagement()">
+                    <div class="menu-card-icon">📜</div>
+                    <div class="menu-card-title">Manage Characters</div>
+                    <div class="menu-card-desc">View and edit your characters</div>
+                </div>
+
+                <div class="menu-card" onclick="showSettings()">
+                    <div class="menu-card-icon">⚙️</div>
+                    <div class="menu-card-title">Settings</div>
+                    <div class="menu-card-desc">Customize your experience</div>
+                </div>
+
+                <div class="menu-card" onclick="logout()">
+                    <div class="menu-card-icon">🚪</div>
+                    <div class="menu-card-title">Logout</div>
+                    <div class="menu-card-desc">Exit the realm</div>
+                </div>
             </div>
         </div>
 
-        <div class="section">
-            <h2 class="section-title">Daily Notes</h2>
-            <div class="notes-grid" id="notesGrid"></div>
+        <!-- Character Creation Screen -->
+        <div id="characterCreationScreen" class="screen">
+            <header>
+                <h1>Create Your Character</h1>
+                <p class="subtitle">1st Edition Advanced Dungeons & Dragons</p>
+            </header>
+
+            <div class="card">
+                <h2 class="card-title">Ability Scores</h2>
+                <button class="btn mb-2" onclick="rollAbilityScores()">🎲 Roll Ability Scores (3d6)</button>
+                <div class="stats-grid" id="abilityScores"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Character Details</h2>
+                <div class="form-group">
+                    <label>Character Name</label>
+                    <input type="text" id="characterName" placeholder="Enter character name">
+                </div>
+
+                <div class="form-group">
+                    <label>Race</label>
+                    <select id="characterRace" onchange="updateClassOptions()">
+                        <option value="">Select Race</option>
+                        <option value="Human">Human</option>
+                        <option value="Elf">Elf</option>
+                        <option value="Dwarf">Dwarf</option>
+                        <option value="Halfling">Halfling</option>
+                        <option value="Half-Elf">Half-Elf</option>
+                        <option value="Half-Orc">Half-Orc</option>
+                        <option value="Gnome">Gnome</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="characterClass">
+                        <option value="">Select Class</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Alignment</label>
+                    <select id="characterAlignment">
+                        <option value="">Select Alignment</option>
+                        <option value="Lawful Good">Lawful Good</option>
+                        <option value="Neutral Good">Neutral Good</option>
+                        <option value="Chaotic Good">Chaotic Good</option>
+                        <option value="Lawful Neutral">Lawful Neutral</option>
+                        <option value="True Neutral">True Neutral</option>
+                        <option value="Chaotic Neutral">Chaotic Neutral</option>
+                        <option value="Lawful Evil">Lawful Evil</option>
+                        <option value="Neutral Evil">Neutral Evil</option>
+                        <option value="Chaotic Evil">Chaotic Evil</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-gap flex-center">
+                <button class="btn btn-success" onclick="saveCharacter()">Create Character</button>
+                <button class="btn btn-secondary" onclick="showMainMenu()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Character Management Screen -->
+        <div id="characterManagementScreen" class="screen">
+            <header>
+                <h1>Your Characters</h1>
+                <p class="subtitle">Manage your adventurers</p>
+            </header>
+
+            <div class="character-list" id="characterList"></div>
+
+            <div class="text-center mt-2">
+                <button class="btn btn-secondary" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Character Select Screen -->
+        <div id="characterSelectScreen" class="screen">
+            <header>
+                <h1>Select Your Character</h1>
+                <p class="subtitle">Choose your adventurer</p>
+            </header>
+
+            <div class="character-list" id="characterSelectList"></div>
+
+            <div class="text-center mt-2">
+                <button class="btn btn-secondary" onclick="showMainMenu()">Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Game Session Screen -->
+        <div id="gameSessionScreen" class="screen">
+            <header>
+                <div class="flex flex-between" style="align-items: center;">
+                    <div>
+                        <h1>Adventure in Progress</h1>
+                        <p class="subtitle">World of Greyhawk</p>
+                    </div>
+                    <button class="btn btn-danger" onclick="endSession()">End Session</button>
+                </div>
+            </header>
+
+            <div class="game-layout">
+                <div class="character-panel">
+                    <h3 class="card-title">Character</h3>
+                    <div id="activeCharacterDisplay"></div>
+                </div>
+
+                <div class="game-area">
+                    <div class="narrative-box" id="narrativeBox"></div>
+
+                    <div class="action-bar">
+                        <div class="form-group">
+                            <label>What do you do?</label>
+                            <textarea id="playerAction" rows="3" placeholder="Describe your action..."></textarea>
+                        </div>
+                        <button class="btn btn-success" onclick="submitAction()">Submit Action</button>
+
+                        <div class="dice-roller">
+                            <strong style="color: var(--secondary);">Quick Rolls:</strong>
+                            <button class="dice-btn" onclick="rollDice(4)">d4</button>
+                            <button class="dice-btn" onclick="rollDice(6)">d6</button>
+                            <button class="dice-btn" onclick="rollDice(8)">d8</button>
+                            <button class="dice-btn" onclick="rollDice(10)">d10</button>
+                            <button class="dice-btn" onclick="rollDice(12)">d12</button>
+                            <button class="dice-btn" onclick="rollDice(20)">d20</button>
+                            <button class="dice-btn" onclick="rollDice(100)">d100</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settingsScreen" class="screen">
+            <header>
+                <h1>Settings</h1>
+                <p class="subtitle">Customize Your Experience</p>
+            </header>
+
+            <div class="card">
+                <h2 class="card-title">Game Settings</h2>
+
+                <div class="form-group">
+                    <label>DM Style</label>
+                    <select id="dmStyle">
+                        <option value="descriptive">Descriptive & Immersive</option>
+                        <option value="balanced">Balanced</option>
+                        <option value="concise">Concise & Fast-Paced</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Hard</option>
+                        <option value="deadly">Deadly</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Campaign Setting</label>
+                    <select id="setting">
+                        <option value="greyhawk" selected>World of Greyhawk</option>
+                        <option value="forgotten-realms">Forgotten Realms</option>
+                        <option value="dragonlance">Dragonlance</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-gap flex-center">
+                <button class="btn btn-success" onclick="saveSettings()">Save Settings</button>
+                <button class="btn btn-secondary" onclick="showMainMenu()">Back to Menu</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Initialize app state
-        const APP_START_DATE = new Date('2025-01-01');
-        let currentWeekOffset = 0;
-        let habits = [];
-        let tracking = {};
-        let notes = {};
+        // ========================================
+        // DATA STRUCTURES & STATE
+        // ========================================
 
-        // Color palette for habits
-        const HABIT_COLORS = [
-            '#6366f1', '#8b5cf6', '#ec4899', '#ef4444',
-            '#f59e0b', '#10b981', '#14b8a6', '#06b6d4'
+        let currentUser = null;
+        let currentCharacter = null;
+        let gameSession = null;
+
+        const AD_AND_D_DATA = {
+            classes: {
+                Human: ['Fighter', 'Ranger', 'Paladin', 'Cleric', 'Druid', 'Magic-User', 'Illusionist', 'Thief', 'Assassin', 'Monk'],
+                Elf: ['Fighter', 'Magic-User', 'Thief', 'Fighter/Magic-User', 'Fighter/Thief', 'Magic-User/Thief'],
+                Dwarf: ['Fighter', 'Thief', 'Fighter/Thief'],
+                Halfling: ['Fighter', 'Thief', 'Fighter/Thief'],
+                'Half-Elf': ['Cleric', 'Druid', 'Fighter', 'Ranger', 'Magic-User', 'Thief', 'Cleric/Fighter', 'Cleric/Ranger', 'Fighter/Magic-User', 'Fighter/Thief', 'Magic-User/Thief'],
+                'Half-Orc': ['Cleric', 'Fighter', 'Thief', 'Assassin', 'Cleric/Fighter', 'Cleric/Thief', 'Fighter/Thief'],
+                Gnome: ['Fighter', 'Illusionist', 'Thief', 'Assassin', 'Fighter/Illusionist', 'Fighter/Thief', 'Illusionist/Thief']
+            },
+
+            hitDice: {
+                'Fighter': 10, 'Ranger': 8, 'Paladin': 10,
+                'Cleric': 8, 'Druid': 8,
+                'Magic-User': 4, 'Illusionist': 4,
+                'Thief': 6, 'Assassin': 6,
+                'Monk': 4
+            }
+        };
+
+        // World of Greyhawk locations
+        const GREYHAWK_LOCATIONS = [
+            'City of Greyhawk', 'Dyvers', 'Verbobonc', 'Highport', 'Nulb',
+            'Temple of Elemental Evil', 'Ruins of Castle Greyhawk', 'Village of Hommlet',
+            'Wild Coast', 'Gnarley Forest', 'Cairn Hills', 'Abbor-Alz'
         ];
 
-        // Load data from localStorage
-        function loadData() {
-            const savedHabits = localStorage.getItem('habits');
-            const savedTracking = localStorage.getItem('tracking');
-            const savedNotes = localStorage.getItem('notes');
+        // Encounter tables
+        const ENCOUNTER_TABLES = {
+            dungeon: ['Goblin patrol', 'Orc warriors', 'Skeleton guards', 'Giant rats', 'Trapped corridor', 'Empty chamber', 'Treasure chest', 'Wandering merchant'],
+            wilderness: ['Bandits', 'Wild animals', 'Traveling merchants', 'Mysterious stranger', 'Ruins', 'Cave entrance', 'Ancient shrine', 'Monster tracks'],
+            town: ['Suspicious guard', 'Helpful innkeeper', 'Mysterious hooded figure', 'Local merchant', 'Town crier', 'Drunk patron', 'Street urchin', 'Noble in disguise']
+        };
 
-            if (savedHabits) habits = JSON.parse(savedHabits);
-            if (savedTracking) tracking = JSON.parse(savedTracking);
-            if (savedNotes) notes = JSON.parse(savedNotes);
+        // Story templates
+        const STORY_TEMPLATES = [
+            {
+                type: 'quest',
+                hooks: [
+                    'A desperate villager approaches you, seeking help with a monster terrorizing the area.',
+                    'You discover a mysterious map pointing to ancient ruins.',
+                    'A dying messenger hands you a sealed letter marked "URGENT".',
+                    'The local lord offers a generous reward for a dangerous task.'
+                ]
+            },
+            {
+                type: 'dungeon',
+                descriptions: [
+                    'ancient crypt filled with restless undead',
+                    'forgotten temple dedicated to a dark deity',
+                    'natural cave system inhabited by monsters',
+                    'abandoned wizard\'s tower crackling with magic'
+                ]
+            }
+        ];
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
         }
 
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('habits', JSON.stringify(habits));
-            localStorage.setItem('tracking', JSON.stringify(tracking));
-            localStorage.setItem('notes', JSON.stringify(notes));
+        function saveToStorage(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
         }
 
-        // Add a new habit
-        function addHabit() {
-            const input = document.getElementById('habitInput');
-            const habitName = input.value.trim();
+        function loadFromStorage(key) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        }
 
-            if (!habitName) {
-                alert('Please enter a habit name');
+        function rollDie(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
+
+        function rollDice(sides, count = 1) {
+            let total = 0;
+            let rolls = [];
+            for (let i = 0; i < count; i++) {
+                const roll = rollDie(sides);
+                rolls.push(roll);
+                total += roll;
+            }
+
+            if (gameSession) {
+                addNarrative(`🎲 Rolled ${count}d${sides}: [${rolls.join(', ')}] = ${total}`, 'system');
+            }
+
+            return { total, rolls };
+        }
+
+        function getAbilityModifier(score) {
+            if (score <= 3) return -3;
+            if (score <= 5) return -2;
+            if (score <= 8) return -1;
+            if (score <= 12) return 0;
+            if (score <= 15) return 1;
+            if (score <= 17) return 2;
+            return 3;
+        }
+
+        // ========================================
+        // AUTHENTICATION
+        // ========================================
+
+        function showLogin() {
+            showScreen('loginScreen');
+        }
+
+        function showRegister() {
+            showScreen('registerScreen');
+        }
+
+        function register() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerPasswordConfirm').value;
+
+            if (!username || !password) {
+                alert('Please fill in all fields');
                 return;
             }
 
-            const habit = {
+            if (password !== confirm) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            const users = loadFromStorage('users') || {};
+
+            if (users[username]) {
+                alert('Username already exists');
+                return;
+            }
+
+            users[username] = {
+                password: password, // In production, this should be hashed
+                characters: [],
+                settings: {
+                    dmStyle: 'descriptive',
+                    difficulty: 'normal',
+                    setting: 'greyhawk'
+                },
+                campaigns: []
+            };
+
+            saveToStorage('users', users);
+            alert('Registration successful! Please login.');
+            showLogin();
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const users = loadFromStorage('users') || {};
+
+            if (!users[username] || users[username].password !== password) {
+                alert('Invalid username or password');
+                return;
+            }
+
+            currentUser = username;
+            saveToStorage('currentUser', username);
+            showMainMenu();
+        }
+
+        function logout() {
+            currentUser = null;
+            currentCharacter = null;
+            gameSession = null;
+            localStorage.removeItem('currentUser');
+            showLogin();
+        }
+
+        function showMainMenu() {
+            document.getElementById('welcomeUser').textContent = currentUser;
+            showScreen('mainMenuScreen');
+        }
+
+        // ========================================
+        // CHARACTER CREATION
+        // ========================================
+
+        function showCharacterCreation() {
+            showScreen('characterCreationScreen');
+            document.getElementById('abilityScores').innerHTML = '<p style="color: var(--text-light);">Click "Roll Ability Scores" to begin</p>';
+            document.getElementById('characterName').value = '';
+            document.getElementById('characterRace').value = '';
+            document.getElementById('characterClass').value = '';
+            document.getElementById('characterAlignment').value = '';
+        }
+
+        function rollAbilityScores() {
+            const abilities = ['Strength', 'Intelligence', 'Wisdom', 'Dexterity', 'Constitution', 'Charisma'];
+            const scores = {};
+
+            let html = '';
+            abilities.forEach(ability => {
+                const roll = rollDice(6, 3);
+                scores[ability] = roll.total;
+                const modifier = getAbilityModifier(roll.total);
+                const modifierText = modifier >= 0 ? `+${modifier}` : modifier;
+
+                html += `
+                    <div class="stat-box">
+                        <div class="stat-label">${ability}</div>
+                        <div class="stat-value">${roll.total}</div>
+                        <div class="stat-modifier">${modifierText}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('abilityScores').innerHTML = html;
+            document.getElementById('abilityScores').dataset.scores = JSON.stringify(scores);
+        }
+
+        function updateClassOptions() {
+            const race = document.getElementById('characterRace').value;
+            const classSelect = document.getElementById('characterClass');
+
+            classSelect.innerHTML = '<option value="">Select Class</option>';
+
+            if (race && AD_AND_D_DATA.classes[race]) {
+                AD_AND_D_DATA.classes[race].forEach(className => {
+                    classSelect.innerHTML += `<option value="${className}">${className}</option>`;
+                });
+            }
+        }
+
+        function saveCharacter() {
+            const name = document.getElementById('characterName').value.trim();
+            const race = document.getElementById('characterRace').value;
+            const charClass = document.getElementById('characterClass').value;
+            const alignment = document.getElementById('characterAlignment').value;
+            const scoresData = document.getElementById('abilityScores').dataset.scores;
+
+            if (!name || !race || !charClass || !alignment || !scoresData) {
+                alert('Please complete all fields and roll ability scores');
+                return;
+            }
+
+            const scores = JSON.parse(scoresData);
+
+            // Calculate HP
+            const baseClass = charClass.split('/')[0]; // For multi-class, use first class
+            const hitDie = AD_AND_D_DATA.hitDice[baseClass] || 6;
+            const conMod = getAbilityModifier(scores.Constitution);
+            const hp = Math.max(1, hitDie + conMod);
+
+            const character = {
                 id: Date.now().toString(),
-                name: habitName,
-                color: HABIT_COLORS[habits.length % HABIT_COLORS.length],
+                name,
+                race,
+                class: charClass,
+                alignment,
+                level: 1,
+                xp: 0,
+                hp: hp,
+                maxHp: hp,
+                abilities: scores,
+                equipment: ['Backpack', 'Waterskin', 'Rations (7 days)', 'Bedroll', 'Torches (10)'],
+                gold: rollDice(6, 3).total * 10,
+                spells: [],
                 createdAt: new Date().toISOString()
             };
 
-            habits.push(habit);
-            input.value = '';
-            saveData();
-            render();
+            const users = loadFromStorage('users');
+            users[currentUser].characters.push(character);
+            saveToStorage('users', users);
+
+            alert(`${name} the ${race} ${charClass} has been created!`);
+            showMainMenu();
         }
 
-        // Remove a habit
-        function removeHabit(habitId) {
-            if (!confirm('Are you sure you want to remove this habit?')) return;
+        // ========================================
+        // CHARACTER MANAGEMENT
+        // ========================================
 
-            habits = habits.filter(h => h.id !== habitId);
-            // Clean up tracking data
-            for (let date in tracking) {
-                delete tracking[date][habitId];
-            }
-            saveData();
-            render();
+        function showCharacterManagement() {
+            showScreen('characterManagementScreen');
+            renderCharacterList('characterList', true);
         }
 
-        // Toggle habit completion for a specific date
-        function toggleHabit(habitId, dateStr) {
-            if (!tracking[dateStr]) {
-                tracking[dateStr] = {};
-            }
-            tracking[dateStr][habitId] = !tracking[dateStr][habitId];
-            saveData();
-            render();
-        }
+        function showCharacterSelect() {
+            const users = loadFromStorage('users');
+            const characters = users[currentUser].characters;
 
-        // Update note for a specific date
-        function updateNote(dateStr, value) {
-            if (value.trim()) {
-                notes[dateStr] = value;
-            } else {
-                delete notes[dateStr];
-            }
-            saveData();
-        }
-
-        // Get week dates
-        function getWeekDates(offset = 0) {
-            const startDate = new Date(APP_START_DATE);
-            startDate.setDate(startDate.getDate() + (offset * 7));
-
-            const dates = [];
-            for (let i = 0; i < 7; i++) {
-                const date = new Date(startDate);
-                date.setDate(date.getDate() + i);
-                dates.push(date);
-            }
-            return dates;
-        }
-
-        // Format date to string
-        function formatDate(date) {
-            return date.toISOString().split('T')[0];
-        }
-
-        // Check if date is today
-        function isToday(date) {
-            const today = new Date();
-            return date.toDateString() === today.toDateString();
-        }
-
-        // Navigate to previous week
-        function previousWeek() {
-            currentWeekOffset--;
-            renderCalendar();
-            renderNotes();
-            updateDashboard();
-        }
-
-        // Navigate to next week
-        function nextWeek() {
-            currentWeekOffset++;
-            renderCalendar();
-            renderNotes();
-            updateDashboard();
-        }
-
-        // Calculate statistics
-        function calculateStats() {
-            const weekDates = getWeekDates(currentWeekOffset);
-            let weekTotal = 0;
-            let weekCompleted = 0;
-
-            weekDates.forEach(date => {
-                const dateStr = formatDate(date);
-                habits.forEach(habit => {
-                    weekTotal++;
-                    if (tracking[dateStr] && tracking[dateStr][habit.id]) {
-                        weekCompleted++;
-                    }
-                });
-            });
-
-            const weekPercentage = weekTotal > 0 ? Math.round((weekCompleted / weekTotal) * 100) : 0;
-
-            // Calculate streaks
-            let currentStreak = 0;
-            let bestStreak = 0;
-            let tempStreak = 0;
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            for (let i = 0; i < 365; i++) {
-                const checkDate = new Date(today);
-                checkDate.setDate(checkDate.getDate() - i);
-                const dateStr = formatDate(checkDate);
-
-                const dayTotal = habits.length;
-                let dayCompleted = 0;
-
-                habits.forEach(habit => {
-                    if (tracking[dateStr] && tracking[dateStr][habit.id]) {
-                        dayCompleted++;
-                    }
-                });
-
-                const allCompleted = dayTotal > 0 && dayCompleted === dayTotal;
-
-                if (i === 0 && allCompleted) {
-                    currentStreak++;
-                    tempStreak++;
-                } else if (allCompleted) {
-                    tempStreak++;
-                } else {
-                    if (i === 0) currentStreak = 0;
-                    bestStreak = Math.max(bestStreak, tempStreak);
-                    tempStreak = 0;
-                }
-            }
-
-            bestStreak = Math.max(bestStreak, tempStreak, currentStreak);
-
-            return {
-                totalHabits: habits.length,
-                weekPercentage,
-                currentStreak,
-                bestStreak
-            };
-        }
-
-        // Update dashboard
-        function updateDashboard() {
-            const stats = calculateStats();
-
-            document.getElementById('totalHabits').textContent = stats.totalHabits;
-            document.getElementById('weekCompletion').textContent = stats.weekPercentage + '%';
-            document.getElementById('weekProgress').style.width = stats.weekPercentage + '%';
-            document.getElementById('currentStreak').textContent = stats.currentStreak + ' days';
-            document.getElementById('bestStreak').textContent = stats.bestStreak + ' days';
-        }
-
-        // Render habits list
-        function renderHabitsList() {
-            const container = document.getElementById('habitsList');
-
-            if (habits.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><p>No habits yet. Add your first habit above!</p></div>';
+            if (characters.length === 0) {
+                alert('You have no characters. Create one first!');
+                showCharacterCreation();
                 return;
             }
 
-            container.innerHTML = habits.map(habit => `
-                <div class="habit-tag">
-                    <span class="habit-color" style="background: ${habit.color}"></span>
-                    <span>${habit.name}</span>
-                    <button class="remove-habit" onclick="removeHabit('${habit.id}')" title="Remove habit">×</button>
+            showScreen('characterSelectScreen');
+            renderCharacterList('characterSelectList', false);
+        }
+
+        function renderCharacterList(containerId, showDelete) {
+            const users = loadFromStorage('users');
+            const characters = users[currentUser].characters;
+            const container = document.getElementById(containerId);
+
+            if (characters.length === 0) {
+                container.innerHTML = '<div class="card"><p class="text-center">No characters yet. Create your first adventurer!</p></div>';
+                return;
+            }
+
+            container.innerHTML = characters.map(char => `
+                <div class="character-card" onclick="${showDelete ? '' : `startSession('${char.id}')`}">
+                    <div class="character-header">
+                        <div>
+                            <div class="character-name">${char.name}</div>
+                            <div class="character-level">Level ${char.level}</div>
+                        </div>
+                        ${showDelete ? `<button class="btn btn-danger" onclick="event.stopPropagation(); deleteCharacter('${char.id}')">Delete</button>` : ''}
+                    </div>
+                    <div class="character-class-race">${char.race} ${char.class}</div>
+                    <div style="color: var(--text-light); font-size: 0.9rem;">
+                        HP: ${char.hp}/${char.maxHp} | XP: ${char.xp} | Gold: ${char.gold} gp
+                    </div>
                 </div>
             `).join('');
         }
 
-        // Render calendar
-        function renderCalendar() {
-            const weekDates = getWeekDates(currentWeekOffset);
-            const header = document.getElementById('calendarHeader');
-            const body = document.getElementById('calendarBody');
-
-            // Update week display
-            const weekStart = weekDates[0];
-            const weekEnd = weekDates[6];
-            document.getElementById('currentWeek').textContent =
-                `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-
-            // Render header
-            header.innerHTML = '<th>Habit</th>' + weekDates.map(date => {
-                const todayClass = isToday(date) ? ' today' : '';
-                return `
-                    <th class="${todayClass}">
-                        <div class="date-header">${date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                        <div class="date-number">${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                    </th>
-                `;
-            }).join('');
-
-            // Render body
-            if (habits.length === 0) {
-                body.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="empty-state-icon">🎯</div><p>Add some habits to start tracking!</p></td></tr>';
+        function deleteCharacter(charId) {
+            if (!confirm('Are you sure you want to delete this character? This cannot be undone!')) {
                 return;
             }
 
-            body.innerHTML = habits.map(habit => {
-                return `
-                    <tr>
-                        <td>
-                            <div class="habit-name">
-                                <span class="habit-color" style="background: ${habit.color}"></span>
-                                ${habit.name}
-                            </div>
-                        </td>
-                        ${weekDates.map(date => {
-                            const dateStr = formatDate(date);
-                            const checked = tracking[dateStr] && tracking[dateStr][habit.id];
-                            const todayClass = isToday(date) ? ' today' : '';
-                            return `
-                                <td class="checkbox-cell${todayClass}">
-                                    <input
-                                        type="checkbox"
-                                        class="habit-checkbox"
-                                        ${checked ? 'checked' : ''}
-                                        onchange="toggleHabit('${habit.id}', '${dateStr}')"
-                                    />
-                                </td>
-                            `;
-                        }).join('')}
-                    </tr>
-                `;
-            }).join('');
+            const users = loadFromStorage('users');
+            users[currentUser].characters = users[currentUser].characters.filter(c => c.id !== charId);
+            saveToStorage('users', users);
+            renderCharacterList('characterList', true);
         }
 
-        // Render notes
-        function renderNotes() {
-            const weekDates = getWeekDates(currentWeekOffset);
-            const container = document.getElementById('notesGrid');
+        // ========================================
+        // GAME SESSION
+        // ========================================
 
-            container.innerHTML = weekDates.map(date => {
-                const dateStr = formatDate(date);
-                const note = notes[dateStr] || '';
-                const todayClass = isToday(date) ? ' today' : '';
+        function startSession(charId) {
+            const users = loadFromStorage('users');
+            currentCharacter = users[currentUser].characters.find(c => c.id === charId);
+
+            if (!currentCharacter) {
+                alert('Character not found');
+                return;
+            }
+
+            // Initialize or load game session
+            const existingSession = users[currentUser].campaigns.find(c => c.characterId === charId);
+
+            if (existingSession) {
+                gameSession = existingSession;
+            } else {
+                gameSession = {
+                    characterId: charId,
+                    location: GREYHAWK_LOCATIONS[0],
+                    narrative: [],
+                    questLog: [],
+                    encounterCount: 0,
+                    startedAt: new Date().toISOString()
+                };
+
+                // Opening narration
+                const openingNarrative = generateOpeningNarrative();
+                gameSession.narrative.push({
+                    type: 'dm',
+                    text: openingNarrative,
+                    timestamp: new Date().toISOString()
+                });
+
+                users[currentUser].campaigns.push(gameSession);
+                saveToStorage('users', users);
+            }
+
+            showScreen('gameSessionScreen');
+            renderCharacterPanel();
+            renderNarrative();
+        }
+
+        function generateOpeningNarrative() {
+            const setting = loadFromStorage('users')[currentUser].settings.setting;
+
+            const openings = [
+                `Your journey begins in the bustling ${gameSession.location}. The air is thick with the scent of adventure, and danger lurks around every corner. As ${currentCharacter.name}, you stand at the threshold of greatness. The autumn sun casts long shadows across the cobblestone streets, and you feel the weight of destiny upon your shoulders.`,
+
+                `The road has been long and arduous, but finally you arrive at ${gameSession.location}. As a ${currentCharacter.race} ${currentCharacter.class}, you've heard tales of fortune and glory in these lands. The city gates stand before you, guarded by watchful sentries. What brings you to this place, ${currentCharacter.name}?`,
+
+                `${currentCharacter.name}, your reputation as a ${currentCharacter.class} precedes you. You find yourself in ${gameSession.location}, a place where heroes are forged and legends are born. The streets are alive with activity - merchants hawking their wares, guards making their rounds, and shadowy figures lurking in alleyways. Your adventure is about to begin.`
+            ];
+
+            return openings[Math.floor(Math.random() * openings.length)];
+        }
+
+        function renderCharacterPanel() {
+            const html = `
+                <div style="margin-bottom: 1rem;">
+                    <h3 style="color: var(--text-gold); margin-bottom: 0.5rem;">${currentCharacter.name}</h3>
+                    <p style="color: var(--text-light); font-size: 0.9rem;">${currentCharacter.race} ${currentCharacter.class}</p>
+                    <p style="color: var(--secondary); font-size: 0.9rem;">Level ${currentCharacter.level}</p>
+                </div>
+
+                <div style="margin-bottom: 1rem; padding: 0.5rem; background: var(--bg-dark); border-radius: 4px;">
+                    <strong style="color: var(--secondary);">HP:</strong> ${currentCharacter.hp}/${currentCharacter.maxHp}<br>
+                    <strong style="color: var(--secondary);">XP:</strong> ${currentCharacter.xp}<br>
+                    <strong style="color: var(--secondary);">Gold:</strong> ${currentCharacter.gold} gp
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <strong style="color: var(--secondary); display: block; margin-bottom: 0.5rem;">Abilities:</strong>
+                    ${Object.entries(currentCharacter.abilities).map(([ability, score]) => {
+                        const mod = getAbilityModifier(score);
+                        return `<div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                            <span>${ability.substring(0, 3).toUpperCase()}:</span>
+                            <span>${score} (${mod >= 0 ? '+' : ''}${mod})</span>
+                        </div>`;
+                    }).join('')}
+                </div>
+
+                <div>
+                    <strong style="color: var(--secondary); display: block; margin-bottom: 0.5rem;">Equipment:</strong>
+                    <div style="font-size: 0.9rem; color: var(--text-light);">
+                        ${currentCharacter.equipment.slice(0, 5).join(', ')}${currentCharacter.equipment.length > 5 ? '...' : ''}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('activeCharacterDisplay').innerHTML = html;
+        }
+
+        function renderNarrative() {
+            const narrativeBox = document.getElementById('narrativeBox');
+
+            narrativeBox.innerHTML = gameSession.narrative.map(entry => {
+                const typeClass = entry.type === 'dm' ? 'narrative-dm' :
+                                 entry.type === 'player' ? 'narrative-player' :
+                                 'narrative-system';
+                const prefix = entry.type === 'dm' ? '📖 DM: ' :
+                              entry.type === 'player' ? '⚔️ You: ' :
+                              '🎲 ';
 
                 return `
-                    <div class="note-card${todayClass}">
-                        <div class="note-date">
-                            ${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                        </div>
-                        <textarea
-                            class="note-input"
-                            placeholder="Add notes for this day..."
-                            onchange="updateNote('${dateStr}', this.value)"
-                        >${note}</textarea>
+                    <div class="narrative-entry ${typeClass}">
+                        <strong style="color: var(--secondary);">${prefix}</strong>
+                        ${entry.text}
                     </div>
                 `;
             }).join('');
+
+            // Scroll to bottom
+            narrativeBox.scrollTop = narrativeBox.scrollHeight;
         }
 
-        // Main render function
-        function render() {
-            updateDashboard();
-            renderHabitsList();
-            renderCalendar();
-            renderNotes();
-        }
-
-        // Handle Enter key in habit input
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('habitInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    addHabit();
-                }
+        function addNarrative(text, type = 'dm') {
+            gameSession.narrative.push({
+                type,
+                text,
+                timestamp: new Date().toISOString()
             });
 
-            // Initialize
-            loadData();
-            render();
+            // Save session
+            const users = loadFromStorage('users');
+            const campaignIndex = users[currentUser].campaigns.findIndex(c => c.characterId === currentCharacter.id);
+            users[currentUser].campaigns[campaignIndex] = gameSession;
+            saveToStorage('users', users);
+
+            renderNarrative();
+        }
+
+        function submitAction() {
+            const actionInput = document.getElementById('playerAction');
+            const action = actionInput.value.trim();
+
+            if (!action) {
+                alert('Please describe your action');
+                return;
+            }
+
+            // Add player action to narrative
+            addNarrative(action, 'player');
+            actionInput.value = '';
+
+            // Generate DM response
+            setTimeout(() => {
+                const response = generateDMResponse(action);
+                addNarrative(response, 'dm');
+            }, 1000);
+        }
+
+        function generateDMResponse(playerAction) {
+            const users = loadFromStorage('users');
+            const settings = users[currentUser].settings;
+            const action = playerAction.toLowerCase();
+
+            // Increment encounter count
+            gameSession.encounterCount++;
+
+            // Parse action intent
+            if (action.includes('look') || action.includes('examine') || action.includes('search')) {
+                return generateExaminationResponse();
+            } else if (action.includes('talk') || action.includes('speak') || action.includes('ask')) {
+                return generateConversationResponse();
+            } else if (action.includes('attack') || action.includes('fight') || action.includes('combat')) {
+                return generateCombatResponse();
+            } else if (action.includes('go') || action.includes('move') || action.includes('travel') || action.includes('enter')) {
+                return generateMovementResponse();
+            } else if (action.includes('take') || action.includes('grab') || action.includes('pick up')) {
+                return generateItemResponse();
+            } else if (action.includes('cast') || action.includes('spell')) {
+                return generateSpellResponse();
+            } else {
+                return generateGeneralResponse();
+            }
+        }
+
+        function generateExaminationResponse() {
+            const responses = [
+                `You carefully examine the area. ${generateRoomDescription()} You notice ${generateDiscovery()}.`,
+                `Your ${currentCharacter.race} eyes scan the surroundings. ${generateRoomDescription()} Something catches your attention: ${generateDiscovery()}.`,
+                `As you investigate, ${generateRoomDescription()} Your search reveals ${generateDiscovery()}.`
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function generateRoomDescription() {
+            const descriptions = [
+                'The chamber is dimly lit by flickering torches.',
+                'Ancient stonework surrounds you, covered in mysterious runes.',
+                'The air is damp and musty, speaking of ages long past.',
+                'Shadows dance along the walls as your torch illuminates the space.',
+                'The room is surprisingly well-preserved, despite its age.'
+            ];
+            return descriptions[Math.floor(Math.random() * descriptions.length)];
+        }
+
+        function generateDiscovery() {
+            const discoveries = [
+                'a hidden alcove containing a dusty chest',
+                'fresh footprints leading deeper into the darkness',
+                'ancient writing etched into the stone',
+                'a glint of metal partially buried in debris',
+                'signs of recent passage through this area',
+                'a strange symbol carved into the floor',
+                'the faint sound of dripping water echoing from ahead'
+            ];
+            return discoveries[Math.floor(Math.random() * discoveries.length)];
+        }
+
+        function generateConversationResponse() {
+            const responses = [
+                `A weathered ${generateNPC()} regards you with interest. "Greetings, traveler," they say. "What brings a ${currentCharacter.class} to these parts?"`,
+                `You approach ${generateNPC()} who eyes you cautiously before speaking: "${generateNPCDialogue()}"`,
+                `${generateNPC()} turns to face you. Their expression is difficult to read as they say, "${generateNPCDialogue()}"`
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function generateNPC() {
+            const npcs = [
+                'merchant', 'guard', 'innkeeper', 'traveler', 'priest',
+                'mysterious hooded figure', 'local farmer', 'town elder',
+                'wandering minstrel', 'blacksmith'
+            ];
+            return npcs[Math.floor(Math.random() * npcs.length)];
+        }
+
+        function generateNPCDialogue() {
+            const dialogues = [
+                "These are dangerous times. I'd watch myself if I were you.",
+                "Have you heard the rumors? Strange things happening lately.",
+                "You look capable. We could use someone like you around here.",
+                "Be careful in the ruins to the north. Many have entered, few have returned.",
+                "Welcome to our humble establishment. What can I do for you?"
+            ];
+            return dialogues[Math.floor(Math.random() * dialogues.length)];
+        }
+
+        function generateCombatResponse() {
+            const enemy = generateEnemy();
+            const responses = [
+                `As you ready your weapon, ${enemy} emerges from the shadows! Roll for initiative! (The creature appears ${generateThreatLevel()})`,
+                `Your combat instincts kick in just as ${enemy} attacks! You must act quickly! (${generateThreatLevel()})`,
+                `${enemy} stands before you, weapons drawn! Combat begins! (${generateThreatLevel()})`
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function generateEnemy() {
+            const enemies = [
+                'a hulking orc warrior', 'a pack of goblin raiders', 'a skeletal guardian',
+                'a giant spider', 'a bandit ambush', 'a hobgoblin sergeant',
+                'a zombie shambling forward', 'a dire wolf', 'a kobold patrol'
+            ];
+            return enemies[Math.floor(Math.random() * enemies.length)];
+        }
+
+        function generateThreatLevel() {
+            const levels = [
+                'It looks like a fair fight',
+                'This opponent appears formidable',
+                'You may be outmatched',
+                'Victory should be yours if you\'re careful',
+                'This will be a challenging encounter'
+            ];
+            return levels[Math.floor(Math.random() * levels.length)];
+        }
+
+        function generateMovementResponse() {
+            const newLocation = GREYHAWK_LOCATIONS[Math.floor(Math.random() * GREYHAWK_LOCATIONS.length)];
+            gameSession.location = newLocation;
+
+            return `You travel through the lands of Greyhawk. After some time, you arrive at ${newLocation}. ${generateLocationDescription()} What do you do?`;
+        }
+
+        function generateLocationDescription() {
+            const descriptions = [
+                'The settlement bustles with activity as merchants and travelers go about their business.',
+                'An air of mystery hangs over this place, and you sense adventure awaits.',
+                'The locals eye you with a mixture of curiosity and suspicion.',
+                'This appears to be a relatively safe haven, at least for now.',
+                'You can feel the weight of history in this ancient place.'
+            ];
+            return descriptions[Math.floor(Math.random() * descriptions.length)];
+        }
+
+        function generateItemResponse() {
+            const items = [
+                'a rusty longsword', 'a leather pouch containing 2d6 gold pieces',
+                'a healing potion', 'a mysterious amulet', 'a worn map',
+                'a set of thieves\' tools', 'a spellbook', 'a silver dagger'
+            ];
+            const item = items[Math.floor(Math.random() * items.length)];
+
+            return `You acquire ${item}. It has been added to your inventory. ${generateItemEffect()}`;
+        }
+
+        function generateItemEffect() {
+            const effects = [
+                'It may prove useful in your adventures.',
+                'You sense this item has a story to tell.',
+                'This could be valuable to the right buyer.',
+                'The craftsmanship is remarkable.',
+                'It radiates a faint magical aura.'
+            ];
+            return effects[Math.floor(Math.random() * effects.length)];
+        }
+
+        function generateSpellResponse() {
+            if (!currentCharacter.class.includes('Magic-User') &&
+                !currentCharacter.class.includes('Cleric') &&
+                !currentCharacter.class.includes('Illusionist')) {
+                return `As a ${currentCharacter.class}, you have no spellcasting abilities. Perhaps you should rely on your other skills.`;
+            }
+
+            return `Your incantation echoes through the air! ${generateMagicEffect()} The spell takes effect with ${rollDice(100).total < 50 ? 'perfect precision' : 'minor fluctuations in the weave'}.`;
+        }
+
+        function generateMagicEffect() {
+            const effects = [
+                'Arcane energy crackles from your fingertips.',
+                'The air shimmers with mystical power.',
+                'Reality bends to your will.',
+                'Ancient words of power flow from your lips.',
+                'The fabric of magic responds to your command.'
+            ];
+            return effects[Math.floor(Math.random() * effects.length)];
+        }
+
+        function generateGeneralResponse() {
+            const responses = [
+                `You proceed with your action. ${generateOutcome()} ${generateFollowUp()}`,
+                `Interesting choice! ${generateOutcome()} ${generateFollowUp()}`,
+                `As a ${currentCharacter.class}, you attempt this with confidence. ${generateOutcome()} ${generateFollowUp()}`
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function generateOutcome() {
+            const outcomes = [
+                'Your action yields unexpected results.',
+                'Things proceed as you hoped.',
+                'The situation takes an interesting turn.',
+                'Your experience serves you well.',
+                'This proves more challenging than anticipated.'
+            ];
+            return outcomes[Math.floor(Math.random() * outcomes.length)];
+        }
+
+        function generateFollowUp() {
+            const followUps = [
+                'What is your next move?',
+                'How do you respond?',
+                'What do you do now?',
+                'The choice is yours, adventurer.',
+                'Your adventure continues...'
+            ];
+            return followUps[Math.floor(Math.random() * followUps.length)];
+        }
+
+        function endSession() {
+            if (confirm('End this session? Your progress will be saved.')) {
+                showMainMenu();
+            }
+        }
+
+        // ========================================
+        // SETTINGS
+        // ========================================
+
+        function showSettings() {
+            const users = loadFromStorage('users');
+            const settings = users[currentUser].settings;
+
+            document.getElementById('dmStyle').value = settings.dmStyle;
+            document.getElementById('difficulty').value = settings.difficulty;
+            document.getElementById('setting').value = settings.setting;
+
+            showScreen('settingsScreen');
+        }
+
+        function saveSettings() {
+            const users = loadFromStorage('users');
+            users[currentUser].settings = {
+                dmStyle: document.getElementById('dmStyle').value,
+                difficulty: document.getElementById('difficulty').value,
+                setting: document.getElementById('setting').value
+            };
+            saveToStorage('users', users);
+            alert('Settings saved!');
+            showMainMenu();
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            const savedUser = loadFromStorage('currentUser');
+            if (savedUser) {
+                const users = loadFromStorage('users');
+                if (users && users[savedUser]) {
+                    currentUser = savedUser;
+                    showMainMenu();
+                } else {
+                    showLogin();
+                }
+            } else {
+                showLogin();
+            }
+
+            // Handle Enter key in action input
+            document.getElementById('playerAction').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    submitAction();
+                }
+            });
         });
     </script>
 </body>
