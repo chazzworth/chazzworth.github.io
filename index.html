@@ -700,6 +700,23 @@
             </div>
 
             <div class="card">
+                <h2 class="card-title">💾 Data Management</h2>
+                <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Your data is stored locally in your browser. Export to backup or transfer to another device.
+                </p>
+
+                <div class="flex flex-gap" style="margin-bottom: 1rem;">
+                    <button class="btn" onclick="exportData()">📥 Export Data</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+                    <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
+                </div>
+
+                <p style="color: var(--secondary); font-size: 0.85rem;">
+                    Export creates a backup file. Import restores from a backup (will merge with existing data).
+                </p>
+            </div>
+
+            <div class="card">
                 <h2 class="card-title">🤖 AI Dungeon Master (Advanced)</h2>
                 <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9rem;">
                     Enable Claude AI for truly dynamic, contextual DM responses instead of procedural generation.
@@ -954,7 +971,7 @@
         }
 
         function register() {
-            const username = document.getElementById('registerUsername').value.trim();
+            const username = document.getElementById('registerUsername').value.trim().toLowerCase();
             const password = document.getElementById('registerPassword').value;
             const confirm = document.getElementById('registerPasswordConfirm').value;
 
@@ -992,7 +1009,7 @@
         }
 
         function login() {
-            const username = document.getElementById('loginUsername').value.trim();
+            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
 
             if (!username || !password) {
@@ -2167,6 +2184,54 @@ INSTRUCTIONS:
             saveToStorage('users', users);
             alert(useAI && apiKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
             showMainMenu();
+        }
+
+        function exportData() {
+            const users = loadFromStorage('users');
+            if (!users || Object.keys(users).length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const dataStr = JSON.stringify(users, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `dungeon-master-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            alert('Data exported successfully! Save this file to backup or transfer your data.');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    const existingUsers = loadFromStorage('users') || {};
+
+                    // Merge imported data with existing
+                    const mergedUsers = { ...existingUsers, ...importedData };
+                    saveToStorage('users', mergedUsers);
+
+                    alert(`Data imported successfully! ${Object.keys(importedData).length} user(s) added/updated.`);
+
+                    // Reset file input
+                    event.target.value = '';
+                } catch (error) {
+                    alert('Error importing data. Please make sure the file is a valid backup.');
+                    console.error('Import error:', error);
+                }
+            };
+            reader.readAsText(file);
         }
 
         // ========================================
