@@ -89,6 +89,23 @@
             overflow: hidden;
         }
 
+        .version-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 0.9rem;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
         header::before {
             content: '';
             position: absolute;
@@ -736,6 +753,7 @@
         <!-- Login Screen -->
         <div id="loginScreen" class="screen active">
             <header>
+                <span class="version-badge" id="versionBadge"></span>
                 <h1>⚔️ Solo Dungeon Master ⚔️</h1>
                 <p class="subtitle">Advanced Dungeons & Dragons 1st Edition</p>
             </header>
@@ -762,6 +780,7 @@
         <!-- Register Screen -->
         <div id="registerScreen" class="screen">
             <header>
+                <span class="version-badge" id="versionBadge2"></span>
                 <h1>⚔️ Solo Dungeon Master ⚔️</h1>
                 <p class="subtitle">Create Your Account</p>
             </header>
@@ -792,6 +811,7 @@
         <!-- Main Menu Screen -->
         <div id="mainMenuScreen" class="screen">
             <header>
+                <span class="version-badge" id="versionBadge3"></span>
                 <h1>⚔️ Solo Dungeon Master ⚔️</h1>
                 <p class="subtitle">Welcome, <span id="welcomeUser"></span>!</p>
             </header>
@@ -1117,6 +1137,12 @@
     </div>
 
     <script>
+        // ========================================
+        // VERSION & CONFIGURATION
+        // ========================================
+
+        const GAME_VERSION = 'v1.5.0'; // Update this with each deployment
+
         // ========================================
         // DATA STRUCTURES & STATE
         // ========================================
@@ -2972,7 +2998,13 @@ INSTRUCTIONS:
         // ========================================
 
         window.addEventListener('DOMContentLoaded', async function() {
-            console.log('[Init] Page loaded, checking for cloud sync...');
+            console.log('[Init] Page loaded, version:', GAME_VERSION);
+
+            // Set version badges
+            const versionBadges = document.querySelectorAll('.version-badge');
+            versionBadges.forEach(badge => badge.textContent = GAME_VERSION);
+
+            console.log('[Init] Checking for cloud sync...');
 
             // ALWAYS load from cloud first if configured (ensures data persists across code pushes)
             const cloudSyncEnabled = loadFromStorage('adminCloudSyncEnabled');
