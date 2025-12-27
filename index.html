@@ -753,7 +753,7 @@
             </div>
 
             <div class="card">
-                <h2 class="card-title">🤖 AI Dungeon Master (Advanced)</h2>
+                <h2 class="card-title">🤖 AI Dungeon Master</h2>
                 <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.9rem;">
                     Enable Claude AI for truly dynamic, contextual DM responses instead of procedural generation.
                 </p>
@@ -761,15 +761,10 @@
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 0.5rem;">
                         <input type="checkbox" id="useAI" style="width: auto; margin: 0;">
-                        Use Claude AI API
+                        Use AI Dungeon Master
                     </label>
-                </div>
-
-                <div class="form-group">
-                    <label>Anthropic API Key</label>
-                    <input type="password" id="apiKey" placeholder="sk-ant-api03-...">
-                    <p style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.5rem;">
-                        Get your API key from <a href="https://console.anthropic.com/" target="_blank" style="color: var(--text-gold);">console.anthropic.com</a>
+                    <p style="color: var(--secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+                        <span id="aiStatus"></span>
                     </p>
                 </div>
 
@@ -782,9 +777,25 @@
                     </select>
                 </div>
 
-                <p style="color: var(--warning); font-size: 0.85rem; margin-top: 1rem;">
-                    ⚠️ Using the AI API will incur costs on your Anthropic account. Typical cost: $0.01-0.03 per game session.
-                </p>
+                <details style="margin-top: 1rem;">
+                    <summary style="cursor: pointer; color: var(--text-gold); font-weight: 600;">🔑 Admin: Configure Global API Key</summary>
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 6px;">
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Admins can set a global API key that ALL users can use. This allows everyone to enjoy AI responses without needing their own key.
+                        </p>
+                        <div class="form-group">
+                            <label>Global Anthropic API Key</label>
+                            <input type="password" id="adminApiKey" placeholder="sk-ant-api03-...">
+                            <p style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.5rem;">
+                                Get your API key from <a href="https://console.anthropic.com/" target="_blank" style="color: var(--text-gold);">console.anthropic.com</a>
+                            </p>
+                        </div>
+                        <button class="btn" onclick="saveAdminApiKey()">Save Global API Key</button>
+                        <p style="color: var(--accent); font-size: 0.85rem; margin-top: 1rem;">
+                            ⚠️ This key will be used by all users. API costs will be charged to this account.
+                        </p>
+                    </div>
+                </details>
             </div>
 
             <div class="flex flex-gap flex-center">
@@ -1080,7 +1091,7 @@
             const users = loadFromStorage('users');
             const settings = users[currentUser].settings;
             AI_CONFIG.useAI = settings.useAI || false;
-            AI_CONFIG.apiKey = settings.apiKey || '';
+            AI_CONFIG.apiKey = getEffectiveApiKey(); // Use global or user key
             AI_CONFIG.model = settings.aiModel || 'claude-3-5-sonnet-20241022';
 
             showScreen('mainMenuScreen');
@@ -1458,10 +1469,25 @@
         // AI API Configuration
         const AI_CONFIG = {
             useAI: false, // Set to true to use AI API instead of procedural generation
-            apiKey: '', // Add your Anthropic API key here
+            apiKey: '', // Populated from global or user settings
             model: 'claude-3-5-sonnet-20241022',
             apiEndpoint: 'https://api.anthropic.com/v1/messages'
         };
+
+        // Get the effective API key (global or user-specific)
+        function getEffectiveApiKey() {
+            // Check for global admin key first
+            const globalKey = loadFromStorage('globalApiKey');
+            if (globalKey) return globalKey;
+
+            // Fall back to user-specific key (legacy)
+            if (currentUser) {
+                const users = loadFromStorage('users');
+                return users[currentUser]?.settings?.apiKey || '';
+            }
+
+            return '';
+        }
 
         async function generateDMResponseWithAI(playerAction) {
             const users = loadFromStorage('users');
@@ -1531,7 +1557,9 @@ INSTRUCTIONS:
 
         function generateDMResponse(playerAction) {
             // Use AI or procedural generation based on config
-            if (AI_CONFIG.useAI && AI_CONFIG.apiKey) {
+            const effectiveApiKey = getEffectiveApiKey();
+            if (AI_CONFIG.useAI && effectiveApiKey) {
+                AI_CONFIG.apiKey = effectiveApiKey; // Set for current call
                 return generateDMResponseWithAI(playerAction);
             } else {
                 return generateDMResponseProcedural(playerAction);
@@ -2194,8 +2222,21 @@ INSTRUCTIONS:
 
             // Load AI settings
             document.getElementById('useAI').checked = settings.useAI || false;
-            document.getElementById('apiKey').value = settings.apiKey || '';
             document.getElementById('aiModel').value = settings.aiModel || 'claude-3-5-sonnet-20241022';
+
+            // Load admin API key
+            const globalKey = loadFromStorage('globalApiKey') || '';
+            document.getElementById('adminApiKey').value = globalKey;
+
+            // Update AI status message
+            const statusEl = document.getElementById('aiStatus');
+            if (globalKey) {
+                statusEl.textContent = '✅ AI available (global API key configured)';
+                statusEl.style.color = 'var(--success)';
+            } else {
+                statusEl.textContent = '⚠️ AI requires admin to configure API key';
+                statusEl.style.color = 'var(--secondary)';
+            }
 
             // Load cloud sync settings
             document.getElementById('useCloudSync').checked = settings.useCloudSync || false;
@@ -2208,14 +2249,12 @@ INSTRUCTIONS:
         function saveSettings() {
             const users = loadFromStorage('users');
             const useAI = document.getElementById('useAI').checked;
-            const apiKey = document.getElementById('apiKey').value.trim();
 
             users[currentUser].settings = {
                 dmStyle: document.getElementById('dmStyle').value,
                 difficulty: document.getElementById('difficulty').value,
                 setting: document.getElementById('setting').value,
                 useAI: useAI,
-                apiKey: apiKey,
                 aiModel: document.getElementById('aiModel').value,
                 useCloudSync: document.getElementById('useCloudSync').checked,
                 githubToken: document.getElementById('githubToken').value.trim(),
@@ -2224,7 +2263,6 @@ INSTRUCTIONS:
 
             // Update global AI config
             AI_CONFIG.useAI = useAI;
-            AI_CONFIG.apiKey = apiKey;
             AI_CONFIG.model = document.getElementById('aiModel').value;
 
             saveToStorage('users', users);
@@ -2233,9 +2271,33 @@ INSTRUCTIONS:
             if (users[currentUser].settings.useCloudSync && users[currentUser].settings.githubToken) {
                 syncToCloud(true);
             } else {
-                alert(useAI && apiKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
+                const effectiveKey = getEffectiveApiKey();
+                alert(useAI && effectiveKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
                 showMainMenu();
             }
+        }
+
+        function saveAdminApiKey() {
+            const apiKey = document.getElementById('adminApiKey').value.trim();
+
+            if (!apiKey) {
+                if (confirm('Remove global API key? This will disable AI for all users.')) {
+                    localStorage.removeItem('globalApiKey');
+                    alert('Global API key removed');
+                    showSettings(); // Refresh to update status
+                }
+                return;
+            }
+
+            // Validate format
+            if (!apiKey.startsWith('sk-ant-')) {
+                alert('Invalid API key format. Should start with sk-ant-');
+                return;
+            }
+
+            saveToStorage('globalApiKey', apiKey);
+            alert('Global API key saved! All users can now use AI DM.');
+            showSettings(); // Refresh to update status
         }
 
         function exportData() {
