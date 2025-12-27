@@ -2971,18 +2971,41 @@ INSTRUCTIONS:
         // INITIALIZATION
         // ========================================
 
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', async function() {
+            console.log('[Init] Page loaded, checking for cloud sync...');
+
+            // ALWAYS load from cloud first if configured (ensures data persists across code pushes)
+            const cloudSyncEnabled = loadFromStorage('adminCloudSyncEnabled');
+            const githubToken = loadFromStorage('adminGithubToken');
+            const gistId = loadFromStorage('adminGistId');
+
+            if (cloudSyncEnabled && githubToken && gistId) {
+                try {
+                    console.log('[Init] Cloud sync configured - loading latest data...');
+                    await adminLoadFromCloudSilent();
+                    console.log('[Init] ✓ Data loaded from cloud successfully');
+                } catch (error) {
+                    console.warn('[Init] Could not load from cloud, using local data:', error.message);
+                }
+            } else {
+                console.log('[Init] Cloud sync not configured, using local data only');
+                console.log('[Init] ⚠️ To enable persistence: Admin → Settings → Configure Cloud Sync');
+            }
+
             // Check if user is already logged in
             const savedUser = loadFromStorage('currentUser');
             if (savedUser) {
                 const users = loadFromStorage('users');
                 if (users && users[savedUser]) {
                     currentUser = savedUser;
+                    console.log('[Init] Auto-login user:', savedUser);
                     showMainMenu();
                 } else {
+                    console.log('[Init] Saved user not found, showing login');
                     showLogin();
                 }
             } else {
+                console.log('[Init] No saved user, showing login');
                 showLogin();
             }
 
