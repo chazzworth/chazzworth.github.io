@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEO Personal Operating System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --bg-dark: #0f172a;
+            --bg-medium: #1e293b;
+            --bg-light: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-medium);
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .logo p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .card {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h4 {
+            margin-top: 0;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-medium);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        textarea, input[type="text"], input[type="number"], input[type="date"], select {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            resize: vertical;
+        }
+
+        textarea {
+            min-height: 120px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .entries-list {
+            margin-top: 2rem;
+        }
+
+        .entry-item {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .entry-item:hover {
+            border-color: var(--primary);
+        }
+
+        .entry-content {
+            flex: 1;
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .entry-date {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .entry-preview {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .alert {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            border-left-color: var(--success);
+        }
+
+        .quick-action {
+            display: inline-block;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .life-map-chart {
+            display: grid;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .life-map-item {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+        }
+
+        .life-map-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .life-map-bar {
+            height: 30px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .life-map-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .rating-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .rating-btn.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 2rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .entry-item {
+                flex-direction: column;
+            }
+
+            .entry-actions {
+                margin-top: 1rem;
+                width: 100%;
+            }
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>CEO Personal OS</h1>
+                <p>Your clarity system</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Dashboard</div>
+                <div class="nav-item active" data-section="home">Home</div>
+                <div class="nav-item" data-section="north-star">North Star</div>
+                <div class="nav-item" data-section="life-map">Life Map</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Reviews</div>
+                <div class="nav-item" data-section="daily">Daily Check-in</div>
+                <div class="nav-item" data-section="weekly">Weekly Review</div>
+                <div class="nav-item" data-section="quarterly">Quarterly Review</div>
+                <div class="nav-item" data-section="annual">Annual Review</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Interviews</div>
+                <div class="nav-item" data-section="interview-past">Past Year Reflection</div>
+                <div class="nav-item" data-section="interview-identity">Identity & Values</div>
+                <div class="nav-item" data-section="interview-future">Future Self</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Goals</div>
+                <div class="nav-item" data-section="goals-1yr">1-Year Goals</div>
+                <div class="nav-item" data-section="goals-3yr">3-Year Goals</div>
+                <div class="nav-item" data-section="goals-10yr">10-Year Vision</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Frameworks</div>
+                <div class="nav-item" data-section="framework-annual">Annual Review</div>
+                <div class="nav-item" data-section="framework-vision">Vivid Vision</div>
+                <div class="nav-item" data-section="framework-costing">Lifestyle Costing</div>
+                <div class="nav-item" data-section="framework-lifemap">Life Map Framework</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Memory</div>
+                <div class="nav-item" data-section="memory">Pattern Tracking</div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <!-- Home Section -->
+            <section class="content-section active" id="home">
+                <h2>Welcome to Your Personal Operating System</h2>
+                <p class="subtitle">A private, single-user productivity system for clarity without complexity</p>
+
+                <div class="card">
+                    <h4>Quick Start</h4>
+                    <p>This system helps you reflect, set goals, and maintain alignment through daily, weekly, quarterly, and annual reviews.</p>
+                    <p style="margin-top: 1rem;">Start with:</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn quick-action" onclick="navigateTo('north-star')">Define Your North Star</button>
+                        <button class="btn quick-action" onclick="navigateTo('daily')">Daily Check-in</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>What This System Does</h4>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li><strong>Daily Check-ins</strong> — 5-minute reflection on energy, wins, and priorities</li>
+                        <li><strong>Weekly Reviews</strong> — 15-minute assessment of what moved the needle</li>
+                        <li><strong>Quarterly Reviews</strong> — Strategic pause with Life Map to evaluate goals</li>
+                        <li><strong>Annual Reviews</strong> — Deep reflection using proven frameworks</li>
+                        <li><strong>Interviews</strong> — Guided self-coaching sessions</li>
+                        <li><strong>Goals</strong> — 1-year, 3-year, and 10-year vision tracking</li>
+                        <li><strong>Pattern Tracking</strong> — Identify what repeats across years</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Privacy & Data</h4>
+                    <p>All your data is stored locally in your browser. Nothing is sent to any server. Export your data regularly to keep backups.</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-secondary" onclick="exportData()">Export All Data</button>
+                        <button class="btn btn-secondary" onclick="importData()">Import Data</button>
+                        <button class="btn btn-danger btn-small" onclick="clearAllData()" style="margin-left: 1rem;">Clear All Data</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- North Star Section -->
+            <section class="content-section" id="north-star">
+                <h2>North Star</h2>
+                <p class="subtitle">Your personal mission, values, and non-negotiables</p>
+
+                <div class="alert">
+                    <p>This is your anchor. When making hard decisions or feeling misaligned, come back to this.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Personal Mission (One Sentence)</label>
+                    <textarea id="north-mission" placeholder="What is the work only you can do in the world?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Core Values (3-5 Maximum)</label>
+                    <textarea id="north-values" placeholder="List your non-negotiable principles, one per line..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Non-Negotiables</label>
+                    <textarea id="north-boundaries" placeholder="What boundaries will you enforce, no matter what?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Regret Minimization Test</label>
+                    <textarea id="north-regret" placeholder="At age 80, looking back, what would you regret NOT doing?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>What Energizes You (Even When It's Hard)</label>
+                    <textarea id="north-energizes" placeholder="Activities that drain your time but fill your energy..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>What Drains You (Even When It 'Should' Energize You)</label>
+                    <textarea id="north-drains" placeholder="Things that look good on paper but leave you empty..."></textarea>
+                </div>
+
+                <button class="btn" onclick="saveNorthStar()">Save North Star</button>
+            </section>
+
+            <!-- Life Map Section -->
+            <section class="content-section" id="life-map">
+                <h2>Life Map</h2>
+                <p class="subtitle">Track satisfaction across six core life domains</p>
+
+                <div class="alert">
+                    <p>Rate each domain 1-10. Update this quarterly to see trends over time.</p>
+                </div>
+
+                <div class="life-map-chart" id="life-map-chart">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <button class="btn" onclick="saveLifeMap()">Save Life Map</button>
+
+                <hr class="section-divider">
+
+                <h3>Past Life Maps</h3>
+                <div id="life-map-history"></div>
+            </section>
+
+            <!-- Daily Check-in Section -->
+            <section class="content-section" id="daily">
+                <h2>Daily Check-in</h2>
+                <p class="subtitle">5-minute reflection to close the day</p>
+
+                <div id="daily-form">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="daily-date">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Energy Level (1-10)</label>
+                        <input type="number" id="daily-energy" min="1" max="10" placeholder="Rate your energy today">
+                    </div>
+
+                    <div class="form-group">
+                        <label>What contributed to this energy level?</label>
+                        <textarea id="daily-energy-why" placeholder="Good or bad factors..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Meaningful Win</label>
+                        <textarea id="daily-win" placeholder="What's one thing you're proud of from today?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Friction Point</label>
+                        <textarea id="daily-friction" placeholder="What drained you or created unnecessary friction?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Thing to Let Go Of</label>
+                        <textarea id="daily-letgo" placeholder="What are you carrying from today that you need to release?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Priority for Tomorrow</label>
+                        <textarea id="daily-priority" placeholder="If you could only do one thing tomorrow, what would it be?"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveDailyCheckin()">Save Check-in</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Check-ins</h3>
+                    <div id="daily-entries"></div>
+                </div>
+            </section>
+
+            <!-- Weekly Review Section -->
+            <section class="content-section" id="weekly">
+                <h2>Weekly Review</h2>
+                <p class="subtitle">15-minute strategic pause</p>
+
+                <div id="weekly-form">
+                    <div class="form-group">
+                        <label>Week</label>
+                        <input type="text" id="weekly-date" placeholder="e.g., Week 03, 2025">
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Moved the Needle This Week?</label>
+                        <textarea id="weekly-needle" placeholder="What work, conversation, or decision actually mattered?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Was Noise?</label>
+                        <textarea id="weekly-noise" placeholder="What took time but didn't move anything forward?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Where Did Time Leak?</label>
+                        <textarea id="weekly-leak" placeholder="Where did you spend time you didn't intend to?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Energy Check</label>
+                        <textarea id="weekly-energy" placeholder="What energized you? What drained you?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Strategic Insight</label>
+                        <textarea id="weekly-insight" placeholder="What did you learn that changes how you think or operate?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Adjustment for Next Week</label>
+                        <textarea id="weekly-adjustment" placeholder="What's the single most important thing to change next week?"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveWeeklyReview()">Save Review</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Reviews</h3>
+                    <div id="weekly-entries"></div>
+                </div>
+            </section>
+
+            <!-- Quarterly Review Section -->
+            <section class="content-section" id="quarterly">
+                <h2>Quarterly Review</h2>
+                <p class="subtitle">60-90 minute strategic recalibration</p>
+
+                <div class="alert">
+                    <p>Block 60-90 minutes for this deep reflection. Update your Life Map as part of this review.</p>
+                </div>
+
+                <div id="quarterly-form">
+                    <div class="form-group">
+                        <label>Quarter</label>
+                        <input type="text" id="quarterly-date" placeholder="e.g., Q1 2025">
+                    </div>
+
+                    <h3>Overview</h3>
+                    <div class="form-group">
+                        <label>Summarize the Past 90 Days</label>
+                        <textarea id="quarterly-summary" placeholder="What happened this quarter?"></textarea>
+                    </div>
+
+                    <h3>Goal Progress</h3>
+                    <div class="form-group">
+                        <label>Goals Achieved or Advanced</label>
+                        <textarea id="quarterly-goals-progress" placeholder="What goals did you make meaningful progress on?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Goals Stalled or Ignored</label>
+                        <textarea id="quarterly-goals-stalled" placeholder="What goals did you not pursue? Why?"></textarea>
+                    </div>
+
+                    <h3>Energy vs. Output Analysis</h3>
+                    <div class="form-group">
+                        <label>Where Did You Spend the Most Time?</label>
+                        <textarea id="quarterly-time-spent" placeholder="Projects, meetings, areas of focus..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Where Did You Create the Most Value?</label>
+                        <textarea id="quarterly-value-created" placeholder="High-leverage activities and outcomes..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Drained the Most Energy?</label>
+                        <textarea id="quarterly-drains" placeholder="Even if it seemed productive..."></textarea>
+                    </div>
+
+                    <h3>What Worked / What Didn't</h3>
+                    <div class="form-group">
+                        <label>What Should You Continue?</label>
+                        <textarea id="quarterly-continue" placeholder="Decisions, habits, or strategies to keep..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Should You Stop or Change?</label>
+                        <textarea id="quarterly-stop" placeholder="What's not working?"></textarea>
+                    </div>
+
+                    <h3>Course Correction</h3>
+                    <div class="form-group">
+                        <label>Single Biggest Adjustment for Next Quarter</label>
+                        <textarea id="quarterly-adjustment" placeholder="The one most important change..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Key Insights to Remember</label>
+                        <textarea id="quarterly-insights" placeholder="Patterns, lessons, or realizations..."></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveQuarterlyReview()">Save Quarterly Review</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Quarterly Reviews</h3>
+                    <div id="quarterly-entries"></div>
+                </div>
+            </section>
+
+            <!-- Annual Review Section -->
+            <section class="content-section" id="annual">
+                <h2>Annual Review</h2>
+                <p class="subtitle">3-4 hour deep reflection on the past year</p>
+
+                <div class="alert">
+                    <p>Block a full morning for this. This is the most important reflection of the year.</p>
+                </div>
+
+                <div id="annual-form">
+                    <div class="form-group">
+                        <label>Year</label>
+                        <input type="text" id="annual-year" placeholder="e.g., 2025">
+                    </div>
+
+                    <h3>Part 1: The Year in Summary</h3>
+                    <div class="form-group">
+                        <label>Describe the Past Year (One Paragraph)</label>
+                        <textarea id="annual-summary" placeholder="What happened?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3-5 Most Significant Events or Milestones</label>
+                        <textarea id="annual-milestones" placeholder="Professional and personal..."></textarea>
+                    </div>
+
+                    <h3>Part 2: Highlights (What Worked)</h3>
+                    <div class="form-group">
+                        <label>Professional Wins</label>
+                        <textarea id="annual-pro-wins" placeholder="What worked better than expected? What are you most proud of?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Personal Wins</label>
+                        <textarea id="annual-personal-wins" placeholder="What brought you joy? When did you feel most alive?"></textarea>
+                    </div>
+
+                    <h3>Part 3: Lowlights (What Didn't Work)</h3>
+                    <div class="form-group">
+                        <label>Professional Struggles</label>
+                        <textarea id="annual-pro-struggles" placeholder="What didn't work? Where did you waste time or energy?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Personal Struggles</label>
+                        <textarea id="annual-personal-struggles" placeholder="What drained you? What habits failed? Where did you compromise values?"></textarea>
+                    </div>
+
+                    <h3>Part 4: Lessons Learned</h3>
+                    <div class="form-group">
+                        <label>What Would You Do Differently?</label>
+                        <textarea id="annual-differently" placeholder="If you could redo this year..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Pattern Repeated?</label>
+                        <textarea id="annual-patterns" placeholder="Goals you set but didn't pursue? Problems you named but didn't solve?"></textarea>
+                    </div>
+
+                    <h3>Part 5: The Year Ahead</h3>
+                    <div class="form-group">
+                        <label>Theme for Next Year</label>
+                        <textarea id="annual-theme" placeholder="If next year had a single focus, what would it be?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Would Make Next Year Successful?</label>
+                        <textarea id="annual-success" placeholder="Not just goals, but how you want to feel..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Key Decisions to Make</label>
+                        <textarea id="annual-decisions" placeholder="What big decisions will shape the next year?"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveAnnualReview()">Save Annual Review</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Annual Reviews</h3>
+                    <div id="annual-entries"></div>
+                </div>
+            </section>
+
+            <!-- Past Year Reflection Interview -->
+            <section class="content-section" id="interview-past">
+                <h2>Past Year Reflection Interview</h2>
+                <p class="subtitle">Guided self-interview about the year you just lived (60-90 minutes)</p>
+
+                <div class="alert">
+                    <p>Take your time with these questions. Answer honestly, without editing yourself.</p>
+                </div>
+
+                <div id="interview-past-form">
+                    <div class="form-group">
+                        <label>Year Reflecting On</label>
+                        <input type="text" id="interview-past-year" placeholder="e.g., 2024">
+                    </div>
+
+                    <h3>Opening</h3>
+                    <div class="form-group">
+                        <label>Tell me about the last year in one paragraph. No analysis, just what happened.</label>
+                        <textarea id="interview-past-opening"></textarea>
+                    </div>
+
+                    <h3>The Highlights</h3>
+                    <div class="form-group">
+                        <label>What were the three moments or achievements you're most proud of?</label>
+                        <textarea id="interview-past-highlights"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What's one thing you did that no one else saw, but you're quietly proud of?</label>
+                        <textarea id="interview-past-hidden-win"></textarea>
+                    </div>
+
+                    <h3>The Lowlights</h3>
+                    <div class="form-group">
+                        <label>What were the three hardest moments or biggest disappointments?</label>
+                        <textarea id="interview-past-lowlights"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What pattern do you notice in these lowlights?</label>
+                        <textarea id="interview-past-pattern"></textarea>
+                    </div>
+
+                    <h3>Energy and Alignment</h3>
+                    <div class="form-group">
+                        <label>What drained you the most, even if it "shouldn't" have?</label>
+                        <textarea id="interview-past-drains"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What energized you the most, even if it seemed unproductive?</label>
+                        <textarea id="interview-past-energizes"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>If this year repeated 10 times in a row, would you be satisfied?</label>
+                        <textarea id="interview-past-repeat"></textarea>
+                    </div>
+
+                    <h3>What You Learned</h3>
+                    <div class="form-group">
+                        <label>What's the single most important lesson you learned this year?</label>
+                        <textarea id="interview-past-lesson"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>If you could give your past self (one year ago) one piece of advice, what would it be?</label>
+                        <textarea id="interview-past-advice"></textarea>
+                    </div>
+
+                    <h3>Closing</h3>
+                    <div class="form-group">
+                        <label>What are you ready to leave behind?</label>
+                        <textarea id="interview-past-leave-behind"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveInterviewPast()">Save Interview</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Interviews</h3>
+                    <div id="interview-past-entries"></div>
+                </div>
+            </section>
+
+            <!-- Identity & Values Interview -->
+            <section class="content-section" id="interview-identity">
+                <h2>Identity & Values Interview</h2>
+                <p class="subtitle">Deep self-inquiry on who you are and what you stand for (60-90 minutes)</p>
+
+                <div class="alert">
+                    <p>Don't rush to the "right" answer. Write what's true, even if it's uncomfortable.</p>
+                </div>
+
+                <div id="interview-identity-form">
+                    <h3>Identity</h3>
+                    <div class="form-group">
+                        <label>If you had to describe yourself in three words — not your title, but who you are at your core — what would they be?</label>
+                        <textarea id="interview-identity-three-words"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Who are you when no one is watching?</label>
+                        <textarea id="interview-identity-real-self"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What part of your identity feels performative — adopted to fit expectations?</label>
+                        <textarea id="interview-identity-performative"></textarea>
+                    </div>
+
+                    <h3>Core Values</h3>
+                    <div class="form-group">
+                        <label>What principles do you hold, even when they're inconvenient or costly?</label>
+                        <textarea id="interview-identity-principles"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>If you had to choose three values you will not compromise under any circumstances, what would they be?</label>
+                        <textarea id="interview-identity-values"></textarea>
+                    </div>
+
+                    <h3>What Gives You Meaning</h3>
+                    <div class="form-group">
+                        <label>What work feels meaningful to you, even when it's hard?</label>
+                        <textarea id="interview-identity-meaningful-work"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What impact do you want to have on the world — in real, specific terms?</label>
+                        <textarea id="interview-identity-impact"></textarea>
+                    </div>
+
+                    <h3>Integrity Check</h3>
+                    <div class="form-group">
+                        <label>Where is there a gap between who you say you are and who you actually are?</label>
+                        <textarea id="interview-identity-gap"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What are you pretending not to know?</label>
+                        <textarea id="interview-identity-pretending"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>If you were being completely honest with yourself, what would you change about your life right now?</label>
+                        <textarea id="interview-identity-change"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveInterviewIdentity()">Save Interview</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Interviews</h3>
+                    <div id="interview-identity-entries"></div>
+                </div>
+            </section>
+
+            <!-- Future Self Interview -->
+            <section class="content-section" id="interview-future">
+                <h2>Future Self Interview</h2>
+                <p class="subtitle">Visualize and speak from your future self (45-60 minutes)</p>
+
+                <div class="alert">
+                    <p>Answer these questions AS your future self, in present tense, as if you're already living that life.</p>
+                </div>
+
+                <div id="interview-future-form">
+                    <div class="form-group">
+                        <label>Time Horizon</label>
+                        <select id="interview-future-horizon">
+                            <option value="3">3 years from now</option>
+                            <option value="5">5 years from now</option>
+                            <option value="10">10 years from now</option>
+                        </select>
+                    </div>
+
+                    <h3>Your Life Right Now (From the Future)</h3>
+                    <div class="form-group">
+                        <label>It's [YEAR]. Describe a typical Tuesday in your life right now.</label>
+                        <textarea id="interview-future-typical-day"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What did you do today that made you feel most alive?</label>
+                        <textarea id="interview-future-alive"></textarea>
+                    </div>
+
+                    <h3>Work and Contribution</h3>
+                    <div class="form-group">
+                        <label>What work are you doing right now? Why is it meaningful?</label>
+                        <textarea id="interview-future-work"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What's your relationship with work now compared to [CURRENT YEAR]?</label>
+                        <textarea id="interview-future-work-relationship"></textarea>
+                    </div>
+
+                    <h3>Health and Well-Being</h3>
+                    <div class="form-group">
+                        <label>How's your health right now? What does your body feel like?</label>
+                        <textarea id="interview-future-health"></textarea>
+                    </div>
+
+                    <h3>Lessons Learned (Looking Back)</h3>
+                    <div class="form-group">
+                        <label>When you think about yourself in [CURRENT YEAR], what were you worried about that turned out not to matter?</label>
+                        <textarea id="interview-future-needless-worry"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What decision did you make in [CURRENT YEAR] (or shortly after) that changed everything?</label>
+                        <textarea id="interview-future-key-decision"></textarea>
+                    </div>
+
+                    <h3>Advice to Your Current Self</h3>
+                    <div class="form-group">
+                        <label>What should you stop doing immediately?</label>
+                        <textarea id="interview-future-stop"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What should you start doing, even if it feels hard or premature?</label>
+                        <textarea id="interview-future-start"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>If you could give yourself just one piece of advice, what would it be?</label>
+                        <textarea id="interview-future-advice"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveInterviewFuture()">Save Interview</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Future Self Interviews</h3>
+                    <div id="interview-future-entries"></div>
+                </div>
+            </section>
+
+            <!-- 1-Year Goals -->
+            <section class="content-section" id="goals-1yr">
+                <h2>1-Year Goals</h2>
+                <p class="subtitle">Annual goals with quarterly check-ins</p>
+
+                <div class="alert">
+                    <p>Have you completed your Annual Review first? Goals without reflection are just optimism.</p>
+                </div>
+
+                <div id="goals-1yr-form">
+                    <div class="form-group">
+                        <label>Year</label>
+                        <input type="text" id="goals-1yr-year" placeholder="e.g., 2025">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Theme of the Year</label>
+                        <textarea id="goals-1yr-theme" placeholder="If this year had a single focus, what would it be?"></textarea>
+                    </div>
+
+                    <h3>Professional Goals</h3>
+                    <div class="form-group">
+                        <label>Goal 1</label>
+                        <textarea id="goals-1yr-pro1" placeholder="What does success look like? Why does this matter?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Goal 2</label>
+                        <textarea id="goals-1yr-pro2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Goal 3 (Optional)</label>
+                        <textarea id="goals-1yr-pro3"></textarea>
+                    </div>
+
+                    <h3>Personal Goals</h3>
+                    <div class="form-group">
+                        <label>Health & Energy</label>
+                        <textarea id="goals-1yr-health" placeholder="What does success look like?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Relationships</label>
+                        <textarea id="goals-1yr-relationships"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Learning & Growth</label>
+                        <textarea id="goals-1yr-learning"></textarea>
+                    </div>
+
+                    <h3>What You're Saying No To</h3>
+                    <div class="form-group">
+                        <label>What will you explicitly NOT do this year?</label>
+                        <textarea id="goals-1yr-saying-no"></textarea>
+                    </div>
+
+                    <h3>Success Criteria</h3>
+                    <div class="form-group">
+                        <label>At year-end, what would make this a successful year?</label>
+                        <textarea id="goals-1yr-success"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveGoals1Year()">Save 1-Year Goals</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past 1-Year Goals</h3>
+                    <div id="goals-1yr-entries"></div>
+                </div>
+            </section>
+
+            <!-- 3-Year Goals -->
+            <section class="content-section" id="goals-3yr">
+                <h2>3-Year Goals</h2>
+                <p class="subtitle">Three-year vision and milestones</p>
+
+                <div id="goals-3yr-form">
+                    <div class="form-group">
+                        <label>Time Horizon</label>
+                        <input type="text" id="goals-3yr-horizon" placeholder="e.g., 2025-2028">
+                    </div>
+
+                    <div class="form-group">
+                        <label>In three years, what do you want to be fundamentally different about your life?</label>
+                        <textarea id="goals-3yr-big-question"></textarea>
+                    </div>
+
+                    <h3>Professional Vision</h3>
+                    <div class="form-group">
+                        <label>In three years, what work are you doing? What role are you playing?</label>
+                        <textarea id="goals-3yr-work"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3-5 Major Professional Milestones</label>
+                        <textarea id="goals-3yr-milestones"></textarea>
+                    </div>
+
+                    <h3>Personal Vision</h3>
+                    <div class="form-group">
+                        <label>Health & Vitality</label>
+                        <textarea id="goals-3yr-health"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Relationships</label>
+                        <textarea id="goals-3yr-relationships"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Lifestyle & Freedom</label>
+                        <textarea id="goals-3yr-lifestyle"></textarea>
+                    </div>
+
+                    <h3>Key Decisions</h3>
+                    <div class="form-group">
+                        <label>What are the 2-3 biggest decisions you'll need to make in the next three years?</label>
+                        <textarea id="goals-3yr-decisions"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveGoals3Year()">Save 3-Year Goals</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past 3-Year Goals</h3>
+                    <div id="goals-3yr-entries"></div>
+                </div>
+            </section>
+
+            <!-- 10-Year Vision -->
+            <section class="content-section" id="goals-10yr">
+                <h2>10-Year Vision</h2>
+                <p class="subtitle">Decade-long direction and life design</p>
+
+                <div class="alert">
+                    <p>10 years is not about precise planning. It's about direction.</p>
+                </div>
+
+                <div id="goals-10yr-form">
+                    <div class="form-group">
+                        <label>Time Horizon</label>
+                        <input type="text" id="goals-10yr-horizon" placeholder="e.g., 2025-2035">
+                    </div>
+
+                    <div class="form-group">
+                        <label>In 10 years, what do you want your life to look like?</label>
+                        <textarea id="goals-10yr-central"></textarea>
+                    </div>
+
+                    <h3>Work & Contribution</h3>
+                    <div class="form-group">
+                        <label>What work are you doing? Why?</label>
+                        <textarea id="goals-10yr-work"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What impact have you had that you're most proud of?</label>
+                        <textarea id="goals-10yr-impact"></textarea>
+                    </div>
+
+                    <h3>Lifestyle</h3>
+                    <div class="form-group">
+                        <label>Where are you living? What does your ideal week look like?</label>
+                        <textarea id="goals-10yr-lifestyle"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What does financial security feel like at this stage of life?</label>
+                        <textarea id="goals-10yr-financial"></textarea>
+                    </div>
+
+                    <h3>Legacy</h3>
+                    <div class="form-group">
+                        <label>How do you want to be remembered by the people closest to you?</label>
+                        <textarea id="goals-10yr-legacy"></textarea>
+                    </div>
+
+                    <h3>Regret Minimization</h3>
+                    <div class="form-group">
+                        <label>In 10 years, looking back, what would you regret NOT doing?</label>
+                        <textarea id="goals-10yr-regret"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveGoals10Year()">Save 10-Year Vision</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past 10-Year Visions</h3>
+                    <div id="goals-10yr-entries"></div>
+                </div>
+            </section>
+
+            <!-- Memory/Pattern Tracking -->
+            <section class="content-section" id="memory">
+                <h2>Pattern Tracking</h2>
+                <p class="subtitle">Long-term memory across years</p>
+
+                <div class="alert">
+                    <p>Patterns repeat until you name them. This is where you track insights, recurring themes, and lessons across months and years.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Add New Pattern</label>
+                    <input type="text" id="pattern-title" placeholder="Pattern title (e.g., 'I keep saying I'll prioritize health but don't')">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="pattern-description" placeholder="What is the pattern? Where does it show up?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Root Cause (if known)</label>
+                    <textarea id="pattern-cause" placeholder="What's actually driving this pattern?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Next Action</label>
+                    <textarea id="pattern-action" placeholder="What are you committing to do about this?"></textarea>
+                </div>
+
+                <button class="btn" onclick="savePattern()">Save Pattern</button>
+
+                <div class="entries-list">
+                    <h3>Tracked Patterns</h3>
+                    <div id="pattern-entries"></div>
+                </div>
+            </section>
+
+            <!-- Framework Pages (Read-only) -->
+            <section class="content-section" id="framework-annual">
+                <h2>Annual Review Framework</h2>
+                <p class="subtitle">Based on Dr. Anthony Gustin's approach</p>
+                <div class="card">
+                    <p>The Annual Review is a structured reflection process that helps you acknowledge what actually happened, extract lessons from wins and losses, identify patterns, and set intentions for the next year.</p>
+                    <h4 style="margin-top: 1.5rem;">Core Questions</h4>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li>What were the 3-5 most significant events of the year?</li>
+                        <li>What worked better than expected?</li>
+                        <li>What didn't work as expected?</li>
+                        <li>What lessons did you learn?</li>
+                        <li>What patterns keep repeating?</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><button class="btn" onclick="navigateTo('annual')">Go to Annual Review</button></p>
+                </div>
+            </section>
+
+            <section class="content-section" id="framework-vision">
+                <h2>Vivid Vision Framework</h2>
+                <p class="subtitle">Tony Robbins-style future pacing</p>
+                <div class="card">
+                    <p>Write a detailed, present-tense description of your ideal future as if it's already happening. Not "I will build," but "I'm running a company that..."</p>
+                    <h4 style="margin-top: 1.5rem;">Why This Matters</h4>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li>Goals without emotional clarity feel empty when achieved</li>
+                        <li>Your brain is motivated by vivid emotional futures, not spreadsheets</li>
+                        <li>The more sensory detail, the better</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><button class="btn" onclick="navigateTo('interview-future')">Do Future Self Interview</button></p>
+                </div>
+            </section>
+
+            <section class="content-section" id="framework-costing">
+                <h2>Ideal Lifestyle Costing</h2>
+                <p class="subtitle">Based on Tim Ferriss's Dreamlining</p>
+                <div class="card">
+                    <p>Calculate what your ideal life actually costs. Most people discover it's 30-50% less than they assumed.</p>
+                    <h4 style="margin-top: 1.5rem;">The Process</h4>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li>Define what you want to DO, BE, and HAVE</li>
+                        <li>Calculate the monthly cost of each</li>
+                        <li>Add it all up</li>
+                        <li>Compare to your current reality</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section" id="framework-lifemap">
+                <h2>Life Map Framework</h2>
+                <p class="subtitle">Based on Alex Lieberman's approach</p>
+                <div class="card">
+                    <p>Track satisfaction across six core domains: Career, Relationships, Health, Meaning, Finances, and Fun.</p>
+                    <h4 style="margin-top: 1.5rem;">The Six Domains</h4>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li><strong>Career</strong> — Your work and professional identity</li>
+                        <li><strong>Relationships</strong> — Partner, family, close friends</li>
+                        <li><strong>Health</strong> — Physical and mental well-being</li>
+                        <li><strong>Meaning</strong> — Purpose and contribution</li>
+                        <li><strong>Finances</strong> — Earning, saving, security</li>
+                        <li><strong>Fun</strong> — Joy, play, experiences</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><button class="btn" onclick="navigateTo('life-map')">Update Your Life Map</button></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for viewing/editing entries -->
+    <div class="modal" id="entry-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Entry</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
