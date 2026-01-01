@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEO Personal Operating System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --bg-dark: #0f172a;
+            --bg-medium: #1e293b;
+            --bg-light: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-medium);
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .logo p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .card {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-medium);
+        }
+
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            resize: vertical;
+        }
+
+        textarea {
+            min-height: 120px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .entries-list {
+            margin-top: 2rem;
+        }
+
+        .entry-item {
+            background: var(--bg-medium);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .entry-item:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .entry-date {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .entry-preview {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .framework-content {
+            line-height: 1.8;
+        }
+
+        .framework-content h3 {
+            color: var(--primary);
+            margin-top: 2rem;
+        }
+
+        .framework-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .framework-content li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .alert {
+            background: var(--bg-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            border-left-color: var(--success);
+        }
+
+        .quick-action {
+            display: inline-block;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>CEO Personal OS</h1>
+                <p>Your clarity system</p>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Dashboard</div>
+                <div class="nav-item active" data-section="home">Home</div>
+                <div class="nav-item" data-section="north-star">North Star</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Reviews</div>
+                <div class="nav-item" data-section="daily">Daily Check-in</div>
+                <div class="nav-item" data-section="weekly">Weekly Review</div>
+                <div class="nav-item" data-section="quarterly">Quarterly Review</div>
+                <div class="nav-item" data-section="annual">Annual Review</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Interviews</div>
+                <div class="nav-item" data-section="interview-past">Past Year Reflection</div>
+                <div class="nav-item" data-section="interview-identity">Identity & Values</div>
+                <div class="nav-item" data-section="interview-future">Future Self</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Frameworks</div>
+                <div class="nav-item" data-section="framework-annual">Annual Review</div>
+                <div class="nav-item" data-section="framework-vision">Vivid Vision</div>
+                <div class="nav-item" data-section="framework-costing">Lifestyle Costing</div>
+                <div class="nav-item" data-section="framework-lifemap">Life Map</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Goals</div>
+                <div class="nav-item" data-section="goals-1yr">1-Year Goals</div>
+                <div class="nav-item" data-section="goals-3yr">3-Year Goals</div>
+                <div class="nav-item" data-section="goals-10yr">10-Year Vision</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Memory</div>
+                <div class="nav-item" data-section="memory">Pattern Tracking</div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <!-- Home Section -->
+            <section class="content-section active" id="home">
+                <h2>Welcome to Your Personal Operating System</h2>
+                <p class="subtitle">A private, single-user productivity system for clarity without complexity</p>
+
+                <div class="card">
+                    <h4>Quick Start</h4>
+                    <p>This system helps you reflect, set goals, and maintain alignment through daily, weekly, quarterly, and annual reviews.</p>
+                    <p style="margin-top: 1rem;">Start with:</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn quick-action" onclick="navigateTo('north-star')">Define Your North Star</button>
+                        <button class="btn quick-action" onclick="navigateTo('daily')">Daily Check-in</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>What This System Does</h4>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li><strong>Daily Check-ins</strong> — 5-minute reflection on energy, wins, and priorities</li>
+                        <li><strong>Weekly Reviews</strong> — 15-minute assessment of what moved the needle</li>
+                        <li><strong>Quarterly Reviews</strong> — Strategic pause to evaluate goals and alignment</li>
+                        <li><strong>Annual Reviews</strong> — Deep reflection using proven frameworks</li>
+                        <li><strong>Pattern Tracking</strong> — Identify what repeats across years</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>System Philosophy</h4>
+                    <p>This system assumes:</p>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        <li>You are not lazy, you are misaligned</li>
+                        <li>Clarity comes from reflection, not more information</li>
+                        <li>Patterns repeat until you name them</li>
+                        <li>Energy is the constraint, not time</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>Privacy & Data</h4>
+                    <p>All your data is stored locally in your browser. Nothing is sent to any server. Export your data regularly to keep backups.</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-secondary" onclick="exportData()">Export All Data</button>
+                        <button class="btn btn-secondary" onclick="importData()">Import Data</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Daily Check-in Section -->
+            <section class="content-section" id="daily">
+                <h2>Daily Check-in</h2>
+                <p class="subtitle">5-minute reflection to close the day</p>
+
+                <div id="daily-form">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="text" id="daily-date" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Energy Level (1-10)</label>
+                        <input type="number" id="daily-energy" min="1" max="10" placeholder="Rate your energy today">
+                    </div>
+
+                    <div class="form-group">
+                        <label>What contributed to this energy level?</label>
+                        <textarea id="daily-energy-why" placeholder="Good or bad factors..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Meaningful Win</label>
+                        <textarea id="daily-win" placeholder="What's one thing you're proud of from today?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Friction Point</label>
+                        <textarea id="daily-friction" placeholder="What drained you or created unnecessary friction?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Thing to Let Go Of</label>
+                        <textarea id="daily-letgo" placeholder="What are you carrying from today that you need to release?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Priority for Tomorrow</label>
+                        <textarea id="daily-priority" placeholder="If you could only do one thing tomorrow, what would it be?"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveDailyCheckin()">Save Check-in</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Check-ins</h3>
+                    <div id="daily-entries"></div>
+                </div>
+            </section>
+
+            <!-- Weekly Review Section -->
+            <section class="content-section" id="weekly">
+                <h2>Weekly Review</h2>
+                <p class="subtitle">15-minute strategic pause</p>
+
+                <div id="weekly-form">
+                    <div class="form-group">
+                        <label>Week</label>
+                        <input type="text" id="weekly-date" placeholder="e.g., Week 03, 2025">
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Moved the Needle This Week?</label>
+                        <textarea id="weekly-needle" placeholder="What work, conversation, or decision actually mattered?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What Was Noise?</label>
+                        <textarea id="weekly-noise" placeholder="What took time but didn't move anything forward?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Where Did Time Leak?</label>
+                        <textarea id="weekly-leak" placeholder="Where did you spend time you didn't intend to?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Energy Check</label>
+                        <textarea id="weekly-energy" placeholder="What energized you? What drained you?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Strategic Insight</label>
+                        <textarea id="weekly-insight" placeholder="What did you learn that changes how you think or operate?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>One Adjustment for Next Week</label>
+                        <textarea id="weekly-adjustment" placeholder="What's the single most important thing to change next week?"></textarea>
+                    </div>
+
+                    <button class="btn" onclick="saveWeeklyReview()">Save Review</button>
+                </div>
+
+                <div class="entries-list">
+                    <h3>Past Reviews</h3>
+                    <div id="weekly-entries"></div>
+                </div>
+            </section>
+
+            <!-- North Star Section -->
+            <section class="content-section" id="north-star">
+                <h2>North Star</h2>
+                <p class="subtitle">Your personal mission, values, and non-negotiables</p>
+
+                <div class="alert">
+                    <p>This is your anchor. When making hard decisions or feeling misaligned, come back to this.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Personal Mission (One Sentence)</label>
+                    <textarea id="north-mission" placeholder="What is the work only you can do in the world?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Core Values (3-5 Maximum)</label>
+                    <textarea id="north-values" placeholder="List your non-negotiable principles, one per line..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Non-Negotiables</label>
+                    <textarea id="north-boundaries" placeholder="What boundaries will you enforce, no matter what?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Regret Minimization Test</label>
+                    <textarea id="north-regret" placeholder="At age 80, looking back, what would you regret NOT doing?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>What Energizes You (Even When It's Hard)</label>
+                    <textarea id="north-energizes" placeholder="Activities that drain your time but fill your energy..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>What Drains You (Even When It 'Should' Energize You)</label>
+                    <textarea id="north-drains" placeholder="Things that look good on paper but leave you empty..."></textarea>
+                </div>
+
+                <button class="btn" onclick="saveNorthStar()">Save North Star</button>
+            </section>
+
+            <!-- Memory/Pattern Tracking -->
+            <section class="content-section" id="memory">
+                <h2>Pattern Tracking</h2>
+                <p class="subtitle">Long-term memory across years</p>
+
+                <div class="alert">
+                    <p>Patterns repeat until you name them. This is where you track insights, recurring themes, and lessons across months and years.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Add New Pattern</label>
+                    <input type="text" id="pattern-title" placeholder="Pattern title (e.g., 'I keep saying I'll prioritize health but don't')">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="pattern-description" placeholder="What is the pattern? Where does it show up?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Root Cause (if known)</label>
+                    <textarea id="pattern-cause" placeholder="What's actually driving this pattern?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Next Action</label>
+                    <textarea id="pattern-action" placeholder="What are you committing to do about this?"></textarea>
+                </div>
+
+                <button class="btn" onclick="savePattern()">Save Pattern</button>
+
+                <div class="entries-list">
+                    <h3>Tracked Patterns</h3>
+                    <div id="pattern-entries"></div>
+                </div>
+            </section>
+
+            <!-- Placeholder sections for other features -->
+            <section class="content-section" id="quarterly">
+                <h2>Quarterly Review</h2>
+                <p class="subtitle">Coming soon - 60-90 minute strategic recalibration</p>
+            </section>
+
+            <section class="content-section" id="annual">
+                <h2>Annual Review</h2>
+                <p class="subtitle">Coming soon - 3-4 hour deep reflection</p>
+            </section>
+
+            <section class="content-section" id="interview-past">
+                <h2>Past Year Reflection</h2>
+                <p class="subtitle">Coming soon - Guided interview about the year you just lived</p>
+            </section>
+
+            <section class="content-section" id="interview-identity">
+                <h2>Identity & Values Interview</h2>
+                <p class="subtitle">Coming soon - Deep self-inquiry on who you are and what you stand for</p>
+            </section>
+
+            <section class="content-section" id="interview-future">
+                <h2>Future Self Interview</h2>
+                <p class="subtitle">Coming soon - Visualize and speak from your future self</p>
+            </section>
+
+            <section class="content-section" id="framework-annual">
+                <h2>Annual Review Framework</h2>
+                <p class="subtitle">Based on Dr. Anthony Gustin's approach</p>
+                <div class="framework-content">
+                    <p>The Annual Review is a structured reflection process that helps you acknowledge what actually happened, extract lessons from wins and losses, identify patterns, and set intentions for the next year.</p>
+                    <h3>Core Questions</h3>
+                    <ul>
+                        <li>What were the 3-5 most significant events of the year?</li>
+                        <li>What worked better than expected?</li>
+                        <li>What didn't work as expected?</li>
+                        <li>What lessons did you learn?</li>
+                        <li>What patterns keep repeating?</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section" id="framework-vision">
+                <h2>Vivid Vision Framework</h2>
+                <p class="subtitle">Tony Robbins-style future pacing</p>
+                <div class="framework-content">
+                    <p>Write a detailed, present-tense description of your ideal future as if it's already happening. Not "I will build," but "I'm running a company that..."</p>
+                    <h3>Why This Matters</h3>
+                    <ul>
+                        <li>Goals without emotional clarity feel empty when achieved</li>
+                        <li>Your brain is motivated by vivid emotional futures, not spreadsheets</li>
+                        <li>The more sensory detail, the better</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section" id="framework-costing">
+                <h2>Ideal Lifestyle Costing</h2>
+                <p class="subtitle">Based on Tim Ferriss's Dreamlining</p>
+                <div class="framework-content">
+                    <p>Calculate what your ideal life actually costs. Most people discover it's 30-50% less than they assumed.</p>
+                    <h3>The Process</h3>
+                    <ul>
+                        <li>Define what you want to DO, BE, and HAVE</li>
+                        <li>Calculate the monthly cost of each</li>
+                        <li>Add it all up</li>
+                        <li>Compare to your current reality</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section" id="framework-lifemap">
+                <h2>Life Map Framework</h2>
+                <p class="subtitle">Based on Alex Lieberman's approach</p>
+                <div class="framework-content">
+                    <p>Track satisfaction across six core domains: Career, Relationships, Health, Meaning, Finances, and Fun.</p>
+                    <h3>The Six Domains</h3>
+                    <ul>
+                        <li><strong>Career</strong> — Your work and professional identity</li>
+                        <li><strong>Relationships</strong> — Partner, family, close friends</li>
+                        <li><strong>Health</strong> — Physical and mental well-being</li>
+                        <li><strong>Meaning</strong> — Purpose and contribution</li>
+                        <li><strong>Finances</strong> — Earning, saving, security</li>
+                        <li><strong>Fun</strong> — Joy, play, experiences</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="content-section" id="goals-1yr">
+                <h2>1-Year Goals</h2>
+                <p class="subtitle">Coming soon - Annual goals with quarterly check-ins</p>
+            </section>
+
+            <section class="content-section" id="goals-3yr">
+                <h2>3-Year Goals</h2>
+                <p class="subtitle">Coming soon - 3-year vision and milestones</p>
+            </section>
+
+            <section class="content-section" id="goals-10yr">
+                <h2>10-Year Vision</h2>
+                <p class="subtitle">Coming soon - Decade-long direction and life design</p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.content-section');
+
+        function navigateTo(sectionId) {
+            sections.forEach(s => s.classList.remove('active'));
+            navItems.forEach(n => n.classList.remove('active'));
+
+            const section = document.getElementById(sectionId);
+            const navItem = document.querySelector(`[data-section="${sectionId}"]`);
+
+            if (section) section.classList.add('active');
+            if (navItem) navItem.classList.add('active');
+
+            window.scrollTo(0, 0);
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const section = item.getAttribute('data-section');
+                navigateTo(section);
+            });
+        });
+
+        // Data Storage
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function getData(key) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        }
+
+        function getAllData(prefix) {
+            const data = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(prefix)) {
+                    data.push({
+                        key: key,
+                        ...JSON.parse(localStorage.getItem(key))
+                    });
+                }
+            }
+            return data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        // Daily Check-in
+        function initDailyCheckin() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('daily-date').value = today;
+            loadDailyEntries();
+        }
+
+        function saveDailyCheckin() {
+            const date = document.getElementById('daily-date').value;
+            const data = {
+                date: date,
+                energy: document.getElementById('daily-energy').value,
+                energyWhy: document.getElementById('daily-energy-why').value,
+                win: document.getElementById('daily-win').value,
+                friction: document.getElementById('daily-friction').value,
+                letgo: document.getElementById('daily-letgo').value,
+                priority: document.getElementById('daily-priority').value
+            };
+
+            saveData(`daily-${date}`, data);
+            alert('Daily check-in saved!');
+            clearDailyForm();
+            loadDailyEntries();
+        }
+
+        function clearDailyForm() {
+            document.getElementById('daily-energy').value = '';
+            document.getElementById('daily-energy-why').value = '';
+            document.getElementById('daily-win').value = '';
+            document.getElementById('daily-friction').value = '';
+            document.getElementById('daily-letgo').value = '';
+            document.getElementById('daily-priority').value = '';
+        }
+
+        function loadDailyEntries() {
+            const entries = getAllData('daily-');
+            const container = document.getElementById('daily-entries');
+
+            if (entries.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No check-ins yet. Start your first one above!</p>';
+                return;
+            }
+
+            container.innerHTML = entries.map(entry => `
+                <div class="entry-item">
+                    <div class="entry-date">${entry.date}</div>
+                    <div class="entry-preview">Energy: ${entry.energy}/10 • ${entry.win.substring(0, 100)}${entry.win.length > 100 ? '...' : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        // Weekly Review
+        function saveWeeklyReview() {
+            const date = document.getElementById('weekly-date').value;
+            if (!date) {
+                alert('Please enter the week (e.g., Week 03, 2025)');
+                return;
+            }
+
+            const data = {
+                date: date,
+                needle: document.getElementById('weekly-needle').value,
+                noise: document.getElementById('weekly-noise').value,
+                leak: document.getElementById('weekly-leak').value,
+                energy: document.getElementById('weekly-energy').value,
+                insight: document.getElementById('weekly-insight').value,
+                adjustment: document.getElementById('weekly-adjustment').value
+            };
+
+            saveData(`weekly-${date}`, data);
+            alert('Weekly review saved!');
+            clearWeeklyForm();
+            loadWeeklyEntries();
+        }
+
+        function clearWeeklyForm() {
+            document.getElementById('weekly-date').value = '';
+            document.getElementById('weekly-needle').value = '';
+            document.getElementById('weekly-noise').value = '';
+            document.getElementById('weekly-leak').value = '';
+            document.getElementById('weekly-energy').value = '';
+            document.getElementById('weekly-insight').value = '';
+            document.getElementById('weekly-adjustment').value = '';
+        }
+
+        function loadWeeklyEntries() {
+            const entries = getAllData('weekly-');
+            const container = document.getElementById('weekly-entries');
+
+            if (entries.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No reviews yet.</p>';
+                return;
+            }
+
+            container.innerHTML = entries.map(entry => `
+                <div class="entry-item">
+                    <div class="entry-date">${entry.date}</div>
+                    <div class="entry-preview">${entry.insight.substring(0, 100)}${entry.insight.length > 100 ? '...' : ''}</div>
+                </div>
+            `).join('');
+        }
+
+        // North Star
+        function loadNorthStar() {
+            const data = getData('north-star');
+            if (data) {
+                document.getElementById('north-mission').value = data.mission || '';
+                document.getElementById('north-values').value = data.values || '';
+                document.getElementById('north-boundaries').value = data.boundaries || '';
+                document.getElementById('north-regret').value = data.regret || '';
+                document.getElementById('north-energizes').value = data.energizes || '';
+                document.getElementById('north-drains').value = data.drains || '';
+            }
+        }
+
+        function saveNorthStar() {
+            const data = {
+                mission: document.getElementById('north-mission').value,
+                values: document.getElementById('north-values').value,
+                boundaries: document.getElementById('north-boundaries').value,
+                regret: document.getElementById('north-regret').value,
+                energizes: document.getElementById('north-energizes').value,
+                drains: document.getElementById('north-drains').value
+            };
+
+            saveData('north-star', data);
+            alert('North Star saved!');
+        }
+
+        // Pattern Tracking
+        function savePattern() {
+            const title = document.getElementById('pattern-title').value;
+            if (!title) {
+                alert('Please enter a pattern title');
+                return;
+            }
+
+            const data = {
+                date: new Date().toISOString(),
+                title: title,
+                description: document.getElementById('pattern-description').value,
+                cause: document.getElementById('pattern-cause').value,
+                action: document.getElementById('pattern-action').value
+            };
+
+            const timestamp = Date.now();
+            saveData(`pattern-${timestamp}`, data);
+            alert('Pattern saved!');
+            clearPatternForm();
+            loadPatterns();
+        }
+
+        function clearPatternForm() {
+            document.getElementById('pattern-title').value = '';
+            document.getElementById('pattern-description').value = '';
+            document.getElementById('pattern-cause').value = '';
+            document.getElementById('pattern-action').value = '';
+        }
+
+        function loadPatterns() {
+            const patterns = getAllData('pattern-');
+            const container = document.getElementById('pattern-entries');
+
+            if (patterns.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No patterns tracked yet.</p>';
+                return;
+            }
+
+            container.innerHTML = patterns.map(pattern => `
+                <div class="card">
+                    <h4>${pattern.title}</h4>
+                    <p><strong>Description:</strong> ${pattern.description}</p>
+                    ${pattern.cause ? `<p><strong>Root Cause:</strong> ${pattern.cause}</p>` : ''}
+                    ${pattern.action ? `<p><strong>Next Action:</strong> ${pattern.action}</p>` : ''}
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem;">${new Date(pattern.date).toLocaleDateString()}</p>
+                </div>
+            `).join('');
+        }
+
+        // Export/Import
+        function exportData() {
+            const allData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                allData[key] = localStorage.getItem(key);
+            }
+
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ceo-os-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        Object.keys(data).forEach(key => {
+                            localStorage.setItem(key, data[key]);
+                        });
+                        alert('Data imported successfully!');
+                        location.reload();
+                    } catch (err) {
+                        alert('Error importing data: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            initDailyCheckin();
+            loadWeeklyEntries();
+            loadNorthStar();
+            loadPatterns();
+        });
+    </script>
+</body>
+</html>
