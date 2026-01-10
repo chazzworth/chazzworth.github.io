@@ -1071,19 +1071,25 @@
                     <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 6px;" id="adminContent">
                         <h3 style="color: var(--text-cyan); margin-bottom: 0.5rem;">🤖 Global AI Configuration</h3>
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
-                            Admins can set a global API key that ALL users can use. This allows everyone to enjoy AI responses without needing their own key.
+                            The AI DM feature requires a Cloudflare Worker to securely store your API key and bypass CORS restrictions.
                         </p>
-                        <div class="form-group">
-                            <label>Global Anthropic API Key</label>
-                            <input type="password" id="adminApiKey" placeholder="sk-ant-api03-...">
-                            <p style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.5rem;">
-                                Get your API key from <a href="https://console.anthropic.com/" target="_blank" style="color: var(--text-cyan);">console.anthropic.com</a>
+                        <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                            <h4 style="color: var(--primary); margin-top: 0;">📋 Setup Instructions</h4>
+                            <ol style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6;">
+                                <li>Create free Cloudflare account at <a href="https://dash.cloudflare.com/sign-up" target="_blank" style="color: var(--text-cyan);">dash.cloudflare.com</a></li>
+                                <li>Deploy Worker with provided code (see documentation)</li>
+                                <li>Add your Anthropic API key as encrypted environment variable</li>
+                                <li>Update <code>workerEndpoint</code> in code with your Worker URL</li>
+                                <li>Enable "Use AI Dungeon Master" in Settings</li>
+                            </ol>
+                            <p style="color: var(--text-primary); font-size: 0.85rem; margin: 0.5rem 0 0 0;">
+                                🔒 Your API key is stored securely in Cloudflare (encrypted) and never exposed to the browser.
                             </p>
                         </div>
-                        <button class="btn" onclick="saveAdminApiKey()">Save Global API Key</button>
-                        <p style="color: var(--accent); font-size: 0.85rem; margin-top: 1rem;">
-                            ⚠️ This key will be used by all users. API costs will be charged to this account.
-                        </p>
+                        <div class="form-group">
+                            <label>Worker Status</label>
+                            <p id="workerStatus" style="font-weight: bold; margin-top: 0.5rem;">Checking...</p>
+                        </div>
 
                         <hr style="margin: 1.5rem 0; border-color: var(--border-dark);">
 
@@ -1141,7 +1147,7 @@
         // VERSION & CONFIGURATION
         // ========================================
 
-        const GAME_VERSION = 'v1.5.0'; // Update this with each deployment
+        const GAME_VERSION = 'v1.6.0'; // Update this with each deployment
 
         // ========================================
         // DATA STRUCTURES & STATE
@@ -1452,12 +1458,11 @@
             const users = loadFromStorage('users');
             const settings = users[currentUser].settings;
             AI_CONFIG.useAI = settings.useAI || false;
-            AI_CONFIG.apiKey = getEffectiveApiKey(); // Use global or user key
             AI_CONFIG.model = settings.aiModel || 'claude-3-5-sonnet-20241022';
 
             console.log('[Settings] AI Config loaded:', {
                 useAI: AI_CONFIG.useAI,
-                hasApiKey: !!AI_CONFIG.apiKey,
+                workerConfigured: AI_CONFIG.workerEndpoint !== 'YOUR_WORKER_URL_HERE',
                 model: AI_CONFIG.model
             });
 
@@ -1843,25 +1848,11 @@
         // AI API Configuration
         const AI_CONFIG = {
             useAI: false, // Set to true to use AI API instead of procedural generation
-            apiKey: '', // Populated from global or user settings
             model: 'claude-3-5-sonnet-20241022',
-            apiEndpoint: 'https://api.anthropic.com/v1/messages'
+            workerEndpoint: 'https://solo-dm-ai-proxy.chazzworth.workers.dev'
         };
 
-        // Get the effective API key (global or user-specific)
-        function getEffectiveApiKey() {
-            // Check for global admin key first
-            const globalKey = loadFromStorage('globalApiKey');
-            if (globalKey) return globalKey;
-
-            // Fall back to user-specific key (legacy)
-            if (currentUser) {
-                const users = loadFromStorage('users');
-                return users[currentUser]?.settings?.apiKey || '';
-            }
-
-            return '';
-        }
+        // Legacy function removed - API key now stored in Cloudflare Worker
 
         async function generateDMResponseWithAI(playerAction) {
             const users = loadFromStorage('users');
@@ -1897,14 +1888,12 @@ INSTRUCTIONS:
 - Include consequences and choices`;
 
             try {
-                console.log('[AI] Calling Claude API with model:', AI_CONFIG.model);
+                console.log('[AI] Calling Claude API via Cloudflare Worker with model:', AI_CONFIG.model);
 
-                const response = await fetch(AI_CONFIG.apiEndpoint, {
+                const response = await fetch(AI_CONFIG.workerEndpoint, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': AI_CONFIG.apiKey,
-                        'anthropic-version': '2023-06-01'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         model: AI_CONFIG.model,
@@ -1937,20 +1926,16 @@ INSTRUCTIONS:
 
         async function generateDMResponse(playerAction) {
             // Use AI or procedural generation based on config
-            const effectiveApiKey = getEffectiveApiKey();
-
             console.log('[AI] Config check:', {
                 useAI: AI_CONFIG.useAI,
-                hasApiKey: !!effectiveApiKey,
-                apiKeyPreview: effectiveApiKey ? effectiveApiKey.substring(0, 10) + '...' : 'none'
+                workerConfigured: AI_CONFIG.workerEndpoint !== 'YOUR_WORKER_URL_HERE'
             });
 
-            if (AI_CONFIG.useAI && effectiveApiKey) {
-                AI_CONFIG.apiKey = effectiveApiKey; // Set for current call
-                console.log('[AI] Using AI for DM response');
+            if (AI_CONFIG.useAI && AI_CONFIG.workerEndpoint !== 'YOUR_WORKER_URL_HERE') {
+                console.log('[AI] Using AI for DM response via Cloudflare Worker');
                 return await generateDMResponseWithAI(playerAction);
             } else {
-                console.log('[AI] Using procedural generation - AI disabled or no API key');
+                console.log('[AI] Using procedural generation - AI disabled or Worker not configured');
                 const proceduralResponse = generateDMResponseProcedural(playerAction);
                 return { text: proceduralResponse, isAI: false };
             }
@@ -2614,17 +2599,15 @@ INSTRUCTIONS:
             document.getElementById('useAI').checked = settings.useAI || false;
             document.getElementById('aiModel').value = settings.aiModel || 'claude-3-5-sonnet-20241022';
 
-            // Load admin API key
-            const globalKey = loadFromStorage('globalApiKey') || '';
-            document.getElementById('adminApiKey').value = globalKey;
-
-            // Update AI status message
+            // Update AI status message based on Worker configuration
             const statusEl = document.getElementById('aiStatus');
-            if (globalKey) {
-                statusEl.textContent = '✅ AI available (global API key configured)';
+            const workerConfigured = AI_CONFIG.workerEndpoint !== 'YOUR_WORKER_URL_HERE';
+
+            if (workerConfigured) {
+                statusEl.textContent = '✅ AI available (Cloudflare Worker configured)';
                 statusEl.style.color = 'var(--success)';
             } else {
-                statusEl.textContent = '⚠️ AI requires admin to configure API key';
+                statusEl.textContent = '⚠️ AI requires Cloudflare Worker setup (see Admin Settings)';
                 statusEl.style.color = 'var(--secondary)';
             }
 
@@ -2649,8 +2632,8 @@ INSTRUCTIONS:
 
             saveToStorage('users', users);
 
-            const effectiveKey = getEffectiveApiKey();
-            alert(useAI && effectiveKey ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
+            const workerConfigured = AI_CONFIG.workerEndpoint !== 'YOUR_WORKER_URL_HERE';
+            alert(useAI && workerConfigured ? 'Settings saved! AI DM enabled.' : 'Settings saved!');
             showMainMenu();
         }
 
@@ -2700,9 +2683,8 @@ INSTRUCTIONS:
         }
 
         function loadAdminSettings() {
-            // Load global API key
-            const globalApiKey = loadFromStorage('globalApiKey') || '';
-            document.getElementById('adminApiKey').value = globalApiKey;
+            // Check Worker status
+            checkWorkerStatus();
 
             // Load cloud sync settings
             const cloudSyncEnabled = loadFromStorage('adminCloudSyncEnabled') || false;
@@ -2712,6 +2694,44 @@ INSTRUCTIONS:
             document.getElementById('adminEnableCloudSync').checked = cloudSyncEnabled;
             document.getElementById('adminGithubToken').value = githubToken;
             document.getElementById('adminGistId').value = gistId;
+        }
+
+        async function checkWorkerStatus() {
+            const statusEl = document.getElementById('workerStatus');
+
+            if (AI_CONFIG.workerEndpoint === 'YOUR_WORKER_URL_HERE') {
+                statusEl.textContent = '❌ Not configured (update workerEndpoint in code)';
+                statusEl.style.color = 'var(--accent)';
+                return;
+            }
+
+            statusEl.textContent = '🔄 Testing connection...';
+            statusEl.style.color = 'var(--secondary)';
+
+            try {
+                // Test with a simple request
+                const response = await fetch(AI_CONFIG.workerEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-3-5-sonnet-20241022',
+                        max_tokens: 10,
+                        messages: [{ role: 'user', content: 'test' }]
+                    })
+                });
+
+                if (response.ok || response.status === 400) {
+                    // 400 is okay - means Worker is responding (might be API key issue)
+                    statusEl.textContent = '✅ Worker online and responding';
+                    statusEl.style.color = 'var(--success)';
+                } else {
+                    statusEl.textContent = `⚠️ Worker responding with status ${response.status}`;
+                    statusEl.style.color = 'var(--secondary)';
+                }
+            } catch (error) {
+                statusEl.textContent = `❌ Cannot reach Worker: ${error.message}`;
+                statusEl.style.color = 'var(--accent)';
+            }
         }
 
         function changeAdminPassword() {
@@ -2743,28 +2763,7 @@ INSTRUCTIONS:
             alert('Admin password updated successfully!');
         }
 
-        function saveAdminApiKey() {
-            const apiKey = document.getElementById('adminApiKey').value.trim();
-
-            if (!apiKey) {
-                if (confirm('Remove global API key? This will disable AI for all users.')) {
-                    localStorage.removeItem('globalApiKey');
-                    alert('Global API key removed');
-                    showSettings(); // Refresh to update status
-                }
-                return;
-            }
-
-            // Validate format
-            if (!apiKey.startsWith('sk-ant-')) {
-                alert('Invalid API key format. Should start with sk-ant-');
-                return;
-            }
-
-            saveToStorage('globalApiKey', apiKey);
-            alert('Global API key saved! All users can now use AI DM.');
-            showSettings(); // Refresh to update status
-        }
+        // Legacy function removed - API key now stored in Cloudflare Worker
 
         function saveAdminCloudSettings() {
             const enabled = document.getElementById('adminEnableCloudSync').checked;
@@ -2796,11 +2795,10 @@ INSTRUCTIONS:
             try {
                 const users = loadFromStorage('users');
 
-                // Include admin settings in cloud sync
+                // Include admin settings in cloud sync (API key is now in Cloudflare Worker)
                 const cloudData = {
                     users: users,
                     adminSettings: {
-                        globalApiKey: loadFromStorage('globalApiKey'),
                         adminPassword: loadFromStorage('adminPassword'),
                         adminCloudSyncEnabled: loadFromStorage('adminCloudSyncEnabled')
                     },
@@ -2909,15 +2907,13 @@ INSTRUCTIONS:
 
                     // Restore admin settings
                     if (cloudData.adminSettings) {
-                        if (cloudData.adminSettings.globalApiKey) {
-                            saveToStorage('globalApiKey', cloudData.adminSettings.globalApiKey);
-                        }
                         if (cloudData.adminSettings.adminPassword) {
                             saveToStorage('adminPassword', cloudData.adminSettings.adminPassword);
                         }
                         if (cloudData.adminSettings.adminCloudSyncEnabled !== undefined) {
                             saveToStorage('adminCloudSyncEnabled', cloudData.adminSettings.adminCloudSyncEnabled);
                         }
+                        // Note: globalApiKey is no longer synced - it's stored in Cloudflare Worker
                     }
 
                     console.log('[Cloud] Loaded data version:', cloudData.version);
@@ -2970,10 +2966,6 @@ INSTRUCTIONS:
 
                 // Restore admin settings
                 if (cloudData.adminSettings) {
-                    if (cloudData.adminSettings.globalApiKey) {
-                        saveToStorage('globalApiKey', cloudData.adminSettings.globalApiKey);
-                        console.log('[Cloud Sync] ✓ Restored global API key');
-                    }
                     if (cloudData.adminSettings.adminPassword) {
                         saveToStorage('adminPassword', cloudData.adminSettings.adminPassword);
                         console.log('[Cloud Sync] ✓ Restored admin password');
@@ -2981,6 +2973,7 @@ INSTRUCTIONS:
                     if (cloudData.adminSettings.adminCloudSyncEnabled !== undefined) {
                         saveToStorage('adminCloudSyncEnabled', cloudData.adminSettings.adminCloudSyncEnabled);
                     }
+                    // Note: globalApiKey is no longer synced - it's stored in Cloudflare Worker
                 }
 
                 console.log('[Cloud Sync] Data loaded from cloud (version:', cloudData.version, ')');
